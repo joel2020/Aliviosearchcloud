@@ -1,0 +1,159 @@
+You are my senior full-stack engineer taking over the Alivio Search Cloud repo from Emergent.
+
+Repository:
+Alivio-Search/Aliviosearchcloud
+
+Important context:
+I ran out of Emergent credits, so you are taking over in Replit. Do not rebuild from scratch. Do not create a second app. Use the existing GitHub repo as the source of truth.
+
+Current situation:
+There is a branch called conflict_020526_1754.
+It is diverged from main:
+- ahead by 5 commits
+- behind by 1 commit
+
+Files changed in conflict_020526_1754 include:
+- .emergent/emergent.yml
+- .gitignore
+- DEPLOYMENT.md
+- backend/auth_utils.py
+- backend/runtime.txt
+- backend/server.py
+- backend/startup.txt
+- frontend/src/lib/api.js
+- frontend/staticwebapp.config.json
+
+Goal:
+Create a clean, deploy-ready branch that:
+1. preserves the useful stabilization/deployment work,
+2. avoids conflict branch mess,
+3. switches AI agent usage from Emergent LLM to Azure OpenAI,
+4. keeps the current product scope intact,
+5. prepares the app for Azure deployment.
+
+Critical rules:
+- Do not rebuild the app.
+- Do not redesign the UI.
+- Do not add new CRM features.
+- Do not add new agents.
+- Do not hardcode secrets.
+- Do not commit .env files.
+- Do not remove Stripe functionality unless required.
+- Do not remove emergentintegrations if Stripe still depends on it.
+- Only change what is necessary for stabilization, Azure OpenAI, and deployment readiness.
+
+Step 1 — Repo setup:
+- Pull latest main.
+- Fetch all branches.
+- Inspect conflict_020526_1754.
+- Create a new clean branch from latest main called replit-stabilize-azure-openai.
+- Do not merge conflict_020526_1754 directly.
+
+Step 2 — Port safe stabilization changes:
+From conflict_020526_1754, carefully port only useful changes:
+- DEPLOYMENT.md if missing or newer
+- backend/runtime.txt
+- backend/startup.txt
+- frontend/staticwebapp.config.json
+- backend/server.py Azure MongoDB support:
+  - MONGODB_URI fallback to MONGO_URL
+  - DB_NAME default to alivio
+  - DATABASE_PROVIDER env var
+  - structured logging
+- backend/auth_utils.py JWT_SECRET production guard
+- frontend/src/lib/api.js API URL guard and REACT_APP_API_URL support
+- safe .gitignore additions
+
+Do not overwrite unrelated main changes.
+
+Step 3 — Switch AI agents to Azure OpenAI:
+Current backend/ai_agents.py likely uses:
+- emergentintegrations.llm.chat
+- EMERGENT_LLM_KEY
+- MODEL_PROVIDER="anthropic"
+- Claude model name
+
+Replace only the LLM execution path with Azure OpenAI.
+
+Required env vars:
+- AZURE_OPENAI_ENDPOINT
+- AZURE_OPENAI_API_KEY
+- AZURE_OPENAI_DEPLOYMENT
+- AZURE_OPENAI_API_VERSION
+
+Defaults:
+- AZURE_OPENAI_DEPLOYMENT=gpt-5.5
+- AZURE_OPENAI_API_VERSION=2024-10-21
+
+Important:
+AZURE_OPENAI_DEPLOYMENT must be the Azure deployment name, not necessarily the public model name. Use gpt-5.5 only as a default placeholder if no env var is set.
+
+Implementation:
+- Keep AGENTS unchanged unless absolutely required.
+- Keep this function signature:
+  async def run_agent(agent_key: str, inputs: dict) -> str
+- Create a helper:
+  async def call_llm(system_message: str, user_text: str) -> str
+- Use the official OpenAI Python SDK for Azure OpenAI.
+- Return plain text.
+- Raise a clear RuntimeError if required Azure env vars are missing.
+- Do not silently fall back to Emergent LLM.
+- Do not expose or log API keys.
+
+Step 4 — Requirements:
+In backend/requirements.txt:
+- Add openai>=1.50.0 if missing.
+- Keep emergentintegrations only if still used by Stripe checkout.
+- Confirm no AI agent path requires EMERGENT_LLM_KEY anymore.
+
+Step 5 — Add safe AI config endpoint:
+Add admin-protected endpoint:
+GET /api/ai/config
+
+It must not expose secrets.
+
+Return:
+- provider: azure_openai
+- endpoint_configured: true/false
+- api_key_configured: true/false
+- deployment: AZURE_OPENAI_DEPLOYMENT
+- api_version: AZURE_OPENAI_API_VERSION
+
+Step 6 — Update docs:
+Update DEPLOYMENT.md and backend/.env.example if present.
+
+Document these required AI vars:
+AZURE_OPENAI_ENDPOINT=https://<your-resource>.openai.azure.com/
+AZURE_OPENAI_API_KEY=<set in Azure App Service only>
+AZURE_OPENAI_DEPLOYMENT=gpt-5.5
+AZURE_OPENAI_API_VERSION=2024-10-21
+
+Mark EMERGENT_LLM_KEY as deprecated for AI agent runs.
+
+Step 7 — Tests:
+Run:
+- backend import test
+- python -m py_compile server.py auth_utils.py ai_agents.py
+- confirm /api/agents still lists 12 agents
+- confirm /api/agents/run uses Azure OpenAI path
+- if Azure env vars are missing, confirm it fails with a clear Azure OpenAI missing config error
+- if Azure env vars are available, run one business_research test call
+- frontend build with REACT_APP_API_URL set
+
+Step 8 — Final output:
+Report:
+- branch name
+- commit SHA
+- files changed
+- what was ported from conflict_020526_1754
+- what was ignored from conflict_020526_1754
+- whether backend starts
+- whether frontend builds
+- whether Azure OpenAI was tested live
+- exact Azure App Service env vars required
+- remaining blockers
+- whether safe to merge into main
+
+Do not claim GPT-5.5 works unless a live Azure OpenAI call succeeds against the configured deployment.
+If the Azure deployment does not exist, report:
+AZURE_OPENAI_DEPLOYMENT must be changed to the actual deployment name in Azure AI Foundry/OpenAI.
