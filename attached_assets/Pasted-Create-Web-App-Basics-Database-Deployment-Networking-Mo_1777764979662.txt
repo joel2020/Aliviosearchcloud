@@ -1,0 +1,50 @@
+Create Web App
+Basics
+Database
+Deployment
+Networking
+Monitor + secure
+Tags
+Review + create
+Try Managed Instances (preview) on Azure App Service: a new option that delivers the platform benefits you rely on today, plus added features and flexibility to help you modernize applications seamlesslyLearn More
+App Service Web Apps lets you quickly build, deploy, and scale enterprise-grade web, mobile, and API apps running on any platform. Meet rigorous performance, scalability, security and compliance requirements while using a fully managed platform to perform infrastructure maintenance. Learn more
+Project Details
+Select a subscription to manage deployed resources and costs. Use resource groups like folders to organize and manage all your resources.
+Subscription
+Azure subscription 1
+Resource Group
+swa-alivio-search-cloud-prod_group
+Create new
+Instance Details
+Name
+alivio-backend
+-cjeafaebb2byatbe.centralus-01.azurewebsites.net
+
+Secure unique default hostname on. More about this update
+Publish
+Code
+  	Container
+ 
+Runtime stack
+Python 3.11
+Operating System
+Linux
+  	Windows
+ 
+Region
+Central US
+Not finding your App Service Plan? Try a different region or select your App Service Environment.
+Pricing plans
+App Service plan pricing tier determines the location, features, cost and compute resources associated with your app. Learn more
+Linux Plan (Central US)
+(New) ASP-swaaliviosearchcloudprodgroup-8930
+Create new
+Pricing plan
+Premium V3 P0V3 (195 minimum ACU/vCPU, 4 GB memory, 1 vCPU)
+Explore pricing plans
+Zone redundancy
+An App Service plan can be deployed as a zone redundant service in the regions that support it. Your initial instance count will be set based on your zone redundancy configuration. To ensure you’ll be able to enable zone redundancy at any point in the lifecycle of your app, enable zone redundancy now. You can decrease the instance count after the App Service plan is created.Learn more
+Zone redundancy
+Enabled: Your App Service plan and the apps in it will be zone redundant. The minimum App Service plan instance count will be two.
+Disabled: Your App Service plan and the apps in it will not be zone redundant. The minimum App Service plan instance count will be one.
+  
