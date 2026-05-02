@@ -1,0 +1,178 @@
+You are my senior full-stack engineer and security-focused CTO for Alivio Search Cloud.
+
+Context:
+The app is an AI Revenue Engine for small businesses. It uses:
+- React frontend
+- FastAPI backend
+- Azure DocumentDB with MongoDB compatibility
+- Azure OpenAI / Foundry for 12 AI agents
+- Azure Static Web Apps for frontend
+- Azure App Service for backend
+- Stripe Payment Link for audit payments
+- Cal.com booking link
+
+Current status:
+- PR #1 exists: https://github.com/Alivio-Search/Aliviosearchcloud/pull/1
+- Branch: replit-stabilize-azure-openai
+- 12 AI agents passed smoke tests
+- Azure deployment workflow exists as:
+  .github/azure-app-service-backend.yml.template
+- It needs to be activated after merge
+- Some secrets were accidentally pasted in chat, so security cleanup is required
+
+Your job:
+Do NOT redesign the product.
+Do NOT rebuild the app.
+Finish the production readiness work so the app can be safely deployed and monetized.
+
+Tasks:
+
+1. Security cleanup
+- Search the repo for any hardcoded secrets, tokens, API keys, endpoints, credentials, or connection strings.
+- Remove anything sensitive from code, docs, logs, or test files.
+- Ensure all secrets use environment variables only.
+- Add or update .gitignore to exclude:
+  .env
+  .env.local
+  .env.production
+  *.pem
+  secrets.*
+  local_settings.json
+
+2. Environment variables
+Create/update .env.example with placeholders only:
+
+MONGODB_URI=
+DATABASE_PROVIDER=azure_documentdb
+
+AZURE_OPENAI_ENDPOINT=
+AZURE_OPENAI_API_KEY=
+AZURE_OPENAI_DEPLOYMENT=
+AZURE_OPENAI_API_VERSION=
+
+ELEVENLABS_API_KEY=
+ELEVENLABS_AGENT_ID=
+
+STRIPE_PAYMENT_LINK_AUDIT=
+CAL_LINK=https://cal.com/alivio/intro-call30
+
+FRONTEND_URL=
+BACKEND_URL=
+
+3. Backend deployment readiness
+Confirm FastAPI backend has:
+- GET /health endpoint
+- CORS support using FRONTEND_URL
+- MongoDB/Azure DocumentDB connection helper
+- Azure OpenAI helper
+- production-safe logging
+- structured errors
+- requirements.txt
+- startup command documented:
+  uvicorn server:app --host 0.0.0.0 --port 8000
+
+If the FastAPI entry file is not server.py, identify the correct startup command and update docs.
+
+4. Azure DocumentDB smoke test
+Add or verify:
+
+scripts/test_documentdb_connection.py
+
+It should:
+- read MONGODB_URI
+- connect to Azure DocumentDB using MongoDB-compatible driver
+- insert sample business
+- insert sample lead
+- insert sample deal
+- insert sample agent_run
+- query records
+- update a deal stage
+- print clear success/failure
+
+5. Agent route validation
+Verify these routes exist or scaffold them:
+
+POST /api/agents/revenue-audit
+POST /api/agents/proposal
+POST /api/agents/voice-flow
+POST /api/agents/outreach
+POST /api/agents/followup
+POST /api/agents/local-seo
+POST /api/agents/reputation
+POST /api/agents/report
+POST /api/agents/qa
+
+Each route should:
+- accept JSON
+- validate required fields
+- call the shared agent runner or placeholder
+- save input/output to agent_runs
+- return structured JSON
+- never auto-send email/SMS/calls
+
+6. Activate Azure deployment workflow safely
+The file currently exists as:
+.github/azure-app-service-backend.yml.template
+
+Do not commit secrets.
+
+Create clear instructions to move it to:
+.github/workflows/azure-app-service-backend.yml
+
+The workflow should:
+- trigger on push to main when backend files change
+- support manual workflow dispatch
+- install Python deps
+- validate agent registration
+- deploy to Azure App Service using publish profile secret
+- smoke test /health after deploy
+
+If you have permission to move the file, do it.
+If not, leave exact manual instructions in DEPLOYMENT.md.
+
+7. Update deployment docs
+Update DEPLOYMENT.md or README_AZURE_DEPLOYMENT.md with:
+
+- Azure App Service setup
+- Azure Static Web Apps setup
+- required app settings
+- startup command
+- how to add publish profile to GitHub Secrets
+- how to set FRONTEND_URL / BACKEND_URL
+- how to test /health
+- how to run DocumentDB smoke test
+- how to test one agent route
+- how to connect Stripe Payment Link
+- how to connect Cal.com booking link
+
+8. Monetization readiness
+Add configuration placeholders and docs for:
+
+- STRIPE_PAYMENT_LINK_AUDIT
+- CAL_LINK
+
+Make sure the frontend can display:
+- “AI Revenue Audit — $197”
+- “Apply for the 10-Day AI Revenue Engine”
+- “Book a Strategy Call”
+
+9. Final verification
+Run:
+- backend tests if available
+- import/compile checks
+- agent registration check
+- DocumentDB smoke test if MONGODB_URI is available
+- one AI agent test if Azure env vars are available
+
+10. Final response
+Return:
+- files changed
+- tests run
+- deployment readiness status
+- manual steps I must still do
+- any security risks remaining
+
+Important:
+Do not paste secrets.
+Do not ask me to paste secrets into chat.
+Use environment variables, Azure App Settings, and GitHub Secrets only.
