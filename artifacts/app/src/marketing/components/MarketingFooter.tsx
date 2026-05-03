@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { CTAButton } from "@/components/CTAButton";
 
 export function MarketingFooter() {
   return (
@@ -21,7 +22,15 @@ export function MarketingFooter() {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link href="/agents" className="hover:text-foreground transition-colors">Agents</Link></li>
               <li><Link href="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
-              <li><Link href="/install" className="hover:text-foreground transition-colors">Install Engine</Link></li>
+              <li>
+                <CTAButton
+                  cta="install"
+                  variant="link"
+                  label="Install Engine"
+                  className="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground hover:no-underline"
+                  data-testid="cta-install-footer"
+                />
+              </li>
             </ul>
           </div>
           <div>

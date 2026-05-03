@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Moon, Sun, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CTAButton } from "@/components/CTAButton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
 
@@ -89,11 +90,13 @@ export function MarketingHeader() {
           <Link href="/sign-in" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Sign in
           </Link>
-          <Link href="/sign-up?intent=audit">
-            <Button size="sm" className="font-semibold shadow-md">
-              Run Free Audit
-            </Button>
-          </Link>
+          <CTAButton
+            cta="audit"
+            size="sm"
+            label="Run Free Audit"
+            className="font-semibold shadow-md"
+            data-testid="cta-audit-header"
+          />
         </div>
 
         {/* Mobile Nav */}
@@ -129,11 +132,13 @@ export function MarketingHeader() {
                 <Link href="/sign-in" onClick={() => setIsOpen(false)} className="text-lg font-medium">
                   Sign in
                 </Link>
-                <Link href="/sign-up?intent=audit" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full font-semibold shadow-md" size="lg">
-                    Run Free Audit
-                  </Button>
-                </Link>
+                <CTAButton
+                  cta="audit"
+                  size="lg"
+                  label="Run Free Audit"
+                  className="w-full font-semibold shadow-md"
+                  data-testid="cta-audit-header-mobile"
+                />
               </div>
             </SheetContent>
           </Sheet>
