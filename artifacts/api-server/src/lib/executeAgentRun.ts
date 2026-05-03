@@ -23,16 +23,12 @@ export interface ExecuteAgentRunArgs {
   user: User;
   business: Business;
   log: PinoLikeLogger;
-  /** Override Azure client (for testing / smoke-test reuse). */
   ai?: AzureOpenAIClient | null;
 }
 
 export interface ExecuteAgentRunResult {
-  /** Persisted DB row (always created — even for not_configured/failed). */
   run: AgentRun;
-  /** Latency from start of executor to completion. */
   latencyMs: number;
-  /** Tokens used (0 if Azure was not invoked). */
   tokensUsed: number;
 }
 
@@ -49,13 +45,18 @@ function adaptLogger(log: PinoLikeLogger) {
  * Single source of truth for executing an agent. Used by both the
  * `POST /api/agents/:id/run` route and the admin smoke-test, so every
  * execution path produces an `agent_runs` row and a structured log line.
+ *
+ * `startedAt` is captured before any work begins and `completedAt` is
+ * captured immediately before persistence, so the DB timestamps reflect
+ * true execution boundaries rather than persistence time.
  */
 export async function executeAgentRun(
   args: ExecuteAgentRunArgs,
 ): Promise<ExecuteAgentRunResult> {
   const { agent, rawInput, user, business, log } = args;
   const inputJson = (rawInput ?? {}) as Record<string, unknown>;
-  const startedAt = Date.now();
+  const startedAt = new Date();
+  const startedAtMs = startedAt.getTime();
 
   let ai: AzureOpenAIClient | null = args.ai ?? null;
   if (!ai) {
@@ -63,6 +64,8 @@ export async function executeAgentRun(
       ai = getAzureOpenAIClient();
     } catch (err) {
       if (err instanceof AzureOpenAINotConfiguredError) {
+        const completedAt = new Date();
+        const latencyMs = completedAt.getTime() - startedAtMs;
         const persisted = await persistAgentRun({
           businessId: business.id,
           userId: user.id,
@@ -71,14 +74,16 @@ export async function executeAgentRun(
           input: inputJson,
           output: null,
           errorMessage: err.message,
+          startedAt,
+          completedAt,
         });
-        const latencyMs = Date.now() - startedAt;
         log.warn(
           {
             agentId: agent.id,
             promptVersion: agent.promptVersion,
             businessId: business.id,
             status: "not_configured",
+            success: false,
             latencyMs,
             tokensUsed: 0,
           },
@@ -98,7 +103,8 @@ export async function executeAgentRun(
   };
 
   const result = await agent.run(rawInput, ctx);
-  const latencyMs = Date.now() - startedAt;
+  const completedAt = new Date();
+  const latencyMs = completedAt.getTime() - startedAtMs;
 
   if (result.status === "ok") {
     const persisted = await persistAgentRun({
@@ -109,6 +115,8 @@ export async function executeAgentRun(
       input: inputJson,
       output: result.output,
       tokensUsed: result.tokensUsed,
+      startedAt,
+      completedAt,
     });
     log.info(
       {
@@ -116,6 +124,7 @@ export async function executeAgentRun(
         promptVersion: agent.promptVersion,
         businessId: business.id,
         status: "ok",
+        success: true,
         latencyMs,
         tokensUsed: result.tokensUsed,
       },
@@ -136,6 +145,8 @@ export async function executeAgentRun(
     input: inputJson,
     output: null,
     errorMessage: detailedMessage,
+    startedAt,
+    completedAt,
   });
   log.warn(
     {
@@ -143,6 +154,7 @@ export async function executeAgentRun(
       promptVersion: agent.promptVersion,
       businessId: business.id,
       status: result.status,
+      success: false,
       latencyMs,
       tokensUsed: 0,
     },

@@ -26,12 +26,15 @@ export interface PersistAgentRunArgs {
   output?: Record<string, unknown> | null;
   errorMessage?: string | null;
   tokensUsed?: number;
+  /** Real execution start time (set by executor). */
+  startedAt: Date;
+  /** Real execution end time (set by executor). */
+  completedAt: Date;
 }
 
 export async function persistAgentRun(
   args: PersistAgentRunArgs,
 ): Promise<AgentRun> {
-  const now = new Date();
   const inserted = await db
     .insert(agentRunsTable)
     .values({
@@ -44,8 +47,8 @@ export async function persistAgentRun(
       output: args.output === undefined ? {} : args.output,
       errorMessage: args.errorMessage ?? null,
       tokensUsed: args.tokensUsed ?? 0,
-      startedAt: now,
-      completedAt: now,
+      startedAt: args.startedAt,
+      completedAt: args.completedAt,
     })
     .returning();
   return inserted[0]!;
