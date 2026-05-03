@@ -275,11 +275,13 @@ router.post(
       const mode = body.data.agentMode ?? conv[0].agentMode ?? "general";
       const regenerate = body.data.regenerate === true;
 
-      // For regenerate: drop the most recent assistant message + reuse the
-      // existing user message instead of inserting a new one.
+      // For regenerate: identify the most recent assistant message so we can
+      // replace it AFTER a successful rerun (atomic — keep the old reply if
+      // the new run fails or the assistant is not configured).
+      let staleAssistantId: string | null = null;
       if (regenerate) {
         const lastAssistant = await db
-          .select()
+          .select({ id: assistantMessagesTable.id })
           .from(assistantMessagesTable)
           .where(
             and(
@@ -289,11 +291,7 @@ router.post(
           )
           .orderBy(desc(assistantMessagesTable.createdAt))
           .limit(1);
-        if (lastAssistant[0]) {
-          await db
-            .delete(assistantMessagesTable)
-            .where(eq(assistantMessagesTable.id, lastAssistant[0].id));
-        }
+        staleAssistantId = lastAssistant[0]?.id ?? null;
       }
 
       let userMessage: AssistantMessage | null = null;
@@ -332,6 +330,7 @@ router.post(
 
       const agentHistory = history
         .filter((m) => m.role === "user" || m.role === "assistant")
+        .filter((m) => m.id !== staleAssistantId)
         .slice(-20)
         .map((m) => ({
           role: m.role as "user" | "assistant",
@@ -460,6 +459,11 @@ router.post(
             },
           })
           .returning();
+        if (staleAssistantId) {
+          await db
+            .delete(assistantMessagesTable)
+            .where(eq(assistantMessagesTable.id, staleAssistantId));
+        }
         const refreshed = await db
           .update(assistantConversationsTable)
           .set({ updatedAt: new Date(), agentMode: mode })
@@ -536,6 +540,12 @@ router.post(
           },
         })
         .returning();
+
+      if (staleAssistantId) {
+        await db
+          .delete(assistantMessagesTable)
+          .where(eq(assistantMessagesTable.id, staleAssistantId));
+      }
 
       const refreshed = await db
         .update(assistantConversationsTable)
