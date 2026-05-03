@@ -21,6 +21,8 @@ import {
   assistantConversationsTable,
   assistantMessagesTable,
   agentRunsTable,
+  usersTable,
+  businessesTable,
   type AssistantChannelConnection,
 } from "@workspace/db";
 import { agentRegistry } from "@workspace/agents";
@@ -251,13 +253,28 @@ router.post(
             typeof out.summary === "string" ? out.summary.slice(0, 240) : "",
         };
       });
+      // Load real user + business records so the assistant has full
+      // business context (name, industry, website, etc.) — not a stub.
+      const [userRow] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.id, conn.userId))
+        .limit(1);
+      const [businessRow] = await db
+        .select()
+        .from(businessesTable)
+        .where(eq(businessesTable.id, conn.businessId))
+        .limit(1);
+      if (!userRow || !businessRow) {
+        log.warn(
+          { userId: conn.userId, businessId: conn.businessId },
+          "twilio inbound: connection references missing user/business; replying with apology",
+        );
+      }
       try {
-        const user = { id: conn.userId } as Parameters<
-          typeof executeAgentRun
-        >[0]["user"];
-        const business = { id: conn.businessId } as Parameters<
-          typeof executeAgentRun
-        >[0]["business"];
+        if (!userRow || !businessRow) {
+          throw new Error("missing_user_or_business");
+        }
         const { run } = await executeAgentRun({
           agent,
           rawInput: {
@@ -266,8 +283,8 @@ router.post(
             mode: "general",
             recentRuns,
           },
-          user,
-          business,
+          user: userRow,
+          business: businessRow,
           log,
         });
         if (run.status === "ok") {
