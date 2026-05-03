@@ -92,6 +92,6 @@ The fastest way to get value:
 3. **Layer in the action prompts** — "send the follow-ups," "draft the proposals," "summarize the pipeline."
 4. **Promote it to your team** once the patterns are clear.
 
-For the broader engine that the assistant orchestrates, read [What Is an AI Revenue Engine for Small Business?](/blog/ai-revenue-engine-small-business). For the speed-to-lead piece that pairs naturally with assistant-driven operations, read [Speed-to-Lead Automation](/blog/speed-to-lead-automation). The implementation packages live on the [Pricing page](/pricing).
+For the broader engine that the assistant orchestrates, read [What Is an AI Revenue Engine for Small Business?](/blog/ai-revenue-engine-small-business). For the speed-to-lead piece that pairs naturally with assistant-driven operations, read [Speed-to-Lead Automation](/blog/speed-to-lead-automation). To scope an implementation, [talk to us](/contact).
 
 The shift from "running the business through twelve tools" to "running the business through one assistant" is the biggest productivity gain most small business owners will see this decade. The earlier you adopt the operating model, the bigger the head start.

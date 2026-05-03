@@ -97,6 +97,6 @@ This plan doesn't:
 - Replace your sales judgment. It surfaces opportunities; you close them.
 - Work without clean data. The first two weeks of audit and centralization are not optional.
 
-For more on the systems that power each step, see [The Best Lead Follow-Up System for Small Businesses](/blog/best-lead-follow-up-system-small-businesses) and [Missed Calls Cost Small Businesses More Than They Think](/blog/missed-calls-cost-businesses-money). The implementation packages live on the [Pricing page](/pricing).
+For more on the systems that power each step, see [The Best Lead Follow-Up System for Small Businesses](/blog/best-lead-follow-up-system-small-businesses) and [Missed Calls Cost Small Businesses More Than They Think](/blog/missed-calls-cost-businesses-money). To scope an implementation, [talk to us](/contact).
 
 The revenue is already in your business. You just have to go get it.

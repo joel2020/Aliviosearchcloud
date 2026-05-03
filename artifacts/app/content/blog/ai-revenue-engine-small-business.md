@@ -90,7 +90,7 @@ You're a good fit for an AI Revenue Engine when:
 - You can't justify another full-time hire but the work is real.
 - You want a measurable revenue impact in 30–60 days, not 12 months.
 
-The full agent lineup is on the [Agents page](/agents), and the implementation packages are on the [Pricing page](/pricing).
+The full agent lineup is on the [Agents page](/agents). To scope an implementation for your business, [talk to us](/contact).
 
 ## Where to start
 

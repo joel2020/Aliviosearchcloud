@@ -79,7 +79,7 @@ Alivio's Follow-Up Agent runs the cadence for you. It:
 
 Most importantly, it runs the cadence on **every** lead, not just the ones that "feel" promising. That's where the bulk of the recovered revenue lives — in the leads you would have written off.
 
-You can browse the full agent lineup on the [Agents page](/agents) and see implementation pricing on the [Pricing page](/pricing).
+You can browse the full agent lineup on the [Agents page](/agents) and [talk to us](/contact) when you want to scope an install.
 
 ## How to roll it out without breaking what's working
 

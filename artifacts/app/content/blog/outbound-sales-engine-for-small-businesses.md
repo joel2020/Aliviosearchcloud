@@ -102,7 +102,7 @@ A typical SMB outbound program produces:
 
 For a $5,000 average deal, a list of 1,000 well-targeted prospects produces 30–60 meetings, 20–50 shows, and 3–15 closed deals — a 6–30x return on the program in the first 90 days.
 
-The full lineup of outbound and revenue agents is on the [Agents page](/agents), and the engine packages live on the [Pricing page](/pricing).
+The full lineup of outbound and revenue agents is on the [Agents page](/agents). When you're ready to scope an install, [talk to us](/contact).
 
 ## Where to read next
 
