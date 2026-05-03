@@ -1,0 +1,463 @@
+You are my senior CTO, full-stack engineer, QA lead, AI agent architect, and revenue product strategist.
+
+Project: Alivio Search Cloud
+Live frontend: https://www.aliviosearch.cloud
+Live backend: https://alivio-backend-cjeafaebb2byatbe.centralus-01.azurewebsites.net
+Backend docs: https://alivio-backend-cjeafaebb2byatbe.centralus-01.azurewebsites.net/docs
+
+Important context:
+The app already has a React frontend, FastAPI backend, Azure OpenAI connection, MongoDB Cosmos vCore connection, CI/CD, Azure Static Web Apps frontend deployment, and Azure App Service backend deployment. The backend and frontend are live and connected. We are not rebuilding from scratch. We need to harden, test, fix, and improve the existing production app.
+
+Your job:
+Perform a full production readiness review of the entire application and then make the required fixes.
+
+Primary goals:
+1. Verify the frontend works.
+2. Verify the backend works.
+3. Verify frontend-to-backend API calls work.
+4. Verify authentication works.
+5. Verify database reads/writes work.
+6. Verify all AI agents work.
+7. Verify audit generation works end-to-end.
+8. Verify Stripe/Cal.com monetization flow works or add missing wiring.
+9. Add a customer-facing function where users can speak with their AI business assistant/agents via WhatsApp and, where technically possible, iMessage/SMS.
+10. Make the website feel like a premium AI Revenue Engine platform, similar in quality to aiacquisition.com, without copying their brand, copy, code, or design.
+
+CRITICAL SECURITY REQUIREMENTS:
+- Do not expose secrets in code.
+- Do not hardcode API keys.
+- Use environment variables only.
+- Check for leaked secrets in the repo.
+- Ensure .env files are gitignored.
+- Ensure frontend only receives safe public variables.
+- Ensure backend secrets stay server-side.
+- If any secrets appear in code, remove them immediately and document what must be rotated.
+
+Current product positioning:
+Alivio Search Cloud is an AI Revenue Engine for small businesses.
+
+Core promise:
+We install AI systems that capture, convert, and scale revenue — starting with the leads businesses are already losing.
+
+The platform should help businesses:
+- find revenue leaks
+- capture missed calls
+- respond instantly
+- follow up automatically
+- reactivate cold leads
+- launch outbound sales campaigns
+- generate proposals
+- manage AI agents
+- talk to their AI business assistant through messaging channels
+
+PART 1 — FULL CODEBASE AUDIT
+
+Review the full repo:
+- package.json
+- frontend routes/pages/components
+- backend FastAPI routes
+- agent files/services
+- database models/collections
+- environment variable usage
+- GitHub Actions
+- deployment configuration
+- CORS configuration
+- auth/session handling
+- API client configuration
+- error handling
+- loading states
+- production build issues
+
+Create a short internal report before changes:
+- what is working
+- what is broken
+- what is risky
+- what blocks revenue
+- what should be fixed immediately
+
+Then implement the fixes.
+
+PART 2 — FRONTEND QA
+
+Test and fix:
+- homepage
+- landing pages
+- login
+- registration
+- dashboard
+- onboarding
+- audit form
+- audit results
+- agent pages
+- settings
+- pricing/CTA buttons
+- mobile responsiveness
+- navigation
+- broken links
+- loading states
+- empty states
+- error states
+
+Requirements:
+- The homepage must clearly explain the product in 5 seconds.
+- CTAs must point to the correct flow.
+- The site must feel premium, modern, and conversion-focused.
+- Mobile must work cleanly.
+- No broken buttons.
+- No dead pages.
+- No console errors.
+
+Recommended homepage structure:
+1. Hero:
+   Headline:
+   AI Revenue Engine That Captures, Converts, and Scales Your Pipeline
+
+   Subheadline:
+   Alivio Search Cloud helps businesses recover missed revenue, follow up with every lead, and scale pipeline with AI-powered outbound systems.
+
+   Primary CTA:
+   Run Free Revenue Audit
+
+   Secondary CTA:
+   Book Strategy Call
+
+2. Problem section:
+   Most businesses do not have a lead problem. They have a response and follow-up problem.
+
+3. System section:
+   Capture Revenue
+   Convert Revenue
+   Scale Revenue
+
+4. Agent grid:
+   - Missed Call Agent
+   - Instant Response Agent
+   - Follow-Up Agent
+   - Reactivation Agent
+   - Outbound Sales Agent
+   - LinkedIn Outreach Agent
+   - Cold Email Agent
+   - Proposal Agent
+   - SEO Content Agent
+   - Business Assistant Agent
+
+5. Audit CTA:
+   See how much revenue you are losing before another lead disappears.
+
+6. Offer:
+   10-Day AI Revenue Engine
+   $2,500–$5,000 implementation
+   $750–$1,500/month optimization
+
+7. Blog preview:
+   SEO-focused content around revenue recovery, missed calls, lead follow-up, and AI sales automation.
+
+8. Final CTA.
+
+PART 3 — BACKEND QA
+
+Test and fix:
+- /health
+- auth endpoints
+- user creation/login
+- business onboarding endpoints
+- audit/agent run endpoints
+- database writes
+- database reads
+- agent execution
+- OpenAI/Azure OpenAI integration
+- error handling
+- CORS
+- request validation
+- logging
+- rate limiting if present
+
+Add or improve:
+- clear health check response
+- agent smoke test endpoint for admin
+- structured logs
+- safe error messages
+- backend status endpoint showing configured services without exposing secrets
+
+Example safe status response:
+{
+  "api": "ok",
+  "database": "connected",
+  "ai_provider": "configured",
+  "stripe": "configured",
+  "cal_link": "configured",
+  "messaging": {
+    "twilio": "configured",
+    "whatsapp": "configured"
+  }
+}
+
+PART 4 — AGENT TESTING
+
+Find every existing AI agent and verify:
+- it can be imported
+- it can run
+- it returns usable output
+- it handles missing inputs
+- it stores results where expected
+- it does not crash the backend
+- it has clear prompt instructions
+- it is relevant to the current product
+
+Create an admin-only or dev-only agent smoke test:
+Endpoint:
+POST /api/admin/agents/smoke-test
+
+It should run lightweight tests for all agents and return:
+- agent name
+- status: pass/fail
+- latency
+- error if failed
+- short output preview
+
+Do not expose this publicly without auth.
+
+Agents should align around:
+- Revenue Leak Agent
+- Missed Call Agent
+- Follow-Up Agent
+- Reactivation Agent
+- Outbound Sales Agent
+- Lead Research Agent
+- Proposal Agent
+- SEO Content Agent
+- Business Assistant Agent
+
+If existing agents are too broad or unclear, rename and reorganize them around the AI Revenue Engine positioning.
+
+PART 5 — CUSTOMER AI BUSINESS ASSISTANT
+
+Add a new feature:
+
+Customers should be able to speak with their AI agents as a personal business assistant.
+
+Feature name:
+Alivio Business Assistant
+
+Core idea:
+A customer can message their AI assistant and ask things like:
+- How many leads did I get this week?
+- What follow-ups are due today?
+- Draft an email to this prospect.
+- What revenue leaks should I fix first?
+- Create a follow-up sequence for this lead.
+- Summarize my pipeline.
+- Generate a proposal.
+- What should I do today to get more sales?
+
+Frontend requirements:
+Add a “Business Assistant” page in the dashboard.
+
+UI:
+- Chat interface
+- Message input
+- Suggested prompts
+- Conversation history
+- Agent selector or mode selector:
+  - General Business Assistant
+  - Revenue Recovery
+  - Outbound Sales
+  - Follow-Up
+  - Proposal
+  - SEO Content
+
+Backend requirements:
+Create endpoints:
+POST /api/assistant/chat
+GET /api/assistant/conversations
+GET /api/assistant/conversations/{id}
+POST /api/assistant/conversations/{id}/message
+
+Database collections/tables:
+assistant_conversations
+assistant_messages
+assistant_channel_connections
+
+Each message should store:
+- user_id
+- business_id
+- channel: web, whatsapp, sms, imessage_placeholder
+- role: user/assistant/system/tool
+- content
+- agent_mode
+- metadata
+- created_at
+
+Assistant behavior:
+The assistant should know the customer’s business profile, audit results, agent runs, leads, and pipeline data where available.
+It should answer practically and help the business owner take action.
+It should not hallucinate metrics. If data is missing, it should say what data is missing and suggest the next step.
+
+PART 6 — WHATSAPP / SMS MESSAGING
+
+Implement WhatsApp first using Twilio, because it is realistic and production-available.
+
+Add backend webhook:
+POST /api/messaging/twilio/inbound
+
+This should:
+1. Receive inbound WhatsApp/SMS message from Twilio.
+2. Identify the user/business by phone number.
+3. Store the inbound message.
+4. Send the message to the Business Assistant agent.
+5. Store the assistant response.
+6. Reply back through Twilio.
+
+Environment variables:
+TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN
+TWILIO_WHATSAPP_FROM
+TWILIO_SMS_FROM
+PUBLIC_APP_URL
+
+Database:
+assistant_channel_connections:
+- user_id
+- business_id
+- channel
+- phone_number
+- verified
+- created_at
+
+Frontend settings page:
+Add “Connect WhatsApp/SMS Assistant”
+Fields:
+- phone number
+- preferred channel
+- verification status
+
+Important:
+If Twilio credentials are not configured, show “Messaging not configured” safely.
+Do not crash.
+
+PART 7 — iMESSAGE REALITY CHECK
+
+iMessage does not have a simple public business API like Twilio WhatsApp/SMS.
+
+Do NOT fake iMessage support.
+
+Instead:
+- Add “iMessage coming soon” as a placeholder only.
+- Explain internally in comments that iMessage requires Apple Business Messages or a third-party provider with approval.
+- Do not build fake iMessage functionality.
+- Focus production support on WhatsApp and SMS first.
+
+UI copy:
+“WhatsApp and SMS are available first. iMessage support will require Apple Business Messages approval and will be added later.”
+
+PART 8 — MONETIZATION FLOW
+
+Check whether these are wired:
+STRIPE_SECRET_KEY
+STRIPE_PAYMENT_LINK_AUDIT
+STRIPE_PAYMENT_LINK_ENGINE
+CAL_LINK
+REACT_APP_CAL_LINK
+REACT_APP_STRIPE_PAYMENT_LINK_AUDIT
+REACT_APP_STRIPE_PAYMENT_LINK_ENGINE
+
+If missing:
+- Add safe fallback behavior.
+- Add frontend CTA buttons.
+- Do not expose Stripe secret key to frontend.
+- Only expose Stripe payment links if they are safe public links.
+
+Required CTAs:
+- Run Free Revenue Audit
+- Book Strategy Call
+- Install My Revenue Engine
+- Talk to My AI Assistant
+
+PART 9 — BLOG SYSTEM FOR SEO
+
+Add a production-ready blog system if missing.
+
+Routes:
+- /blog
+- /blog/:slug
+
+Blog index:
+- clean card layout
+- categories
+- SEO title/meta
+- CTA to audit
+
+Article template:
+- SEO title
+- meta description
+- H1
+- structured article content
+- internal links
+- CTA block at bottom
+
+Add initial blog posts:
+1. why-small-businesses-lose-leads
+2. missed-calls-cost-businesses-money
+3. best-lead-follow-up-system-small-businesses
+4. ai-revenue-engine-small-business
+5. outbound-sales-engine-for-small-businesses
+6. how-to-recover-lost-revenue
+7. speed-to-lead-automation
+8. ai-business-assistant-for-small-businesses
+
+Each article should connect to the product:
+Problem → revenue loss → AI Revenue Engine solution → CTA.
+
+PART 10 — TESTING
+
+Add tests or scripts where practical:
+- backend health test
+- frontend build test
+- API smoke test
+- agent smoke test
+- assistant chat test
+- Twilio webhook mock test
+
+Create a simple manual QA checklist file:
+PRODUCTION_QA_CHECKLIST.md
+
+Include:
+- frontend routes tested
+- backend endpoints tested
+- auth tested
+- DB tested
+- agents tested
+- assistant tested
+- Stripe tested
+- Cal.com tested
+- WhatsApp/SMS tested
+- mobile tested
+
+PART 11 — DELIVERABLES
+
+After completing work, provide:
+1. Summary of what was fixed.
+2. Files changed.
+3. Any env vars required.
+4. Any manual Azure/GitHub settings I must update.
+5. Any remaining risks.
+6. Exact test commands.
+7. Exact deployment steps.
+8. Confirmation of whether WhatsApp/SMS assistant is ready or waiting on Twilio credentials.
+9. Confirmation that iMessage is only a placeholder unless Apple Business Messages is approved.
+
+Do not rebuild the app.
+Do not break working deployment.
+Do not remove existing functionality.
+Do not hardcode secrets.
+Do not fake production readiness.
+
+Final product outcome:
+Alivio Search Cloud should feel like a premium AI Revenue Engine platform where businesses can:
+- run a revenue audit
+- see missed revenue
+- install a revenue system
+- use AI agents
+- talk to their Business Assistant from the dashboard
+- eventually talk to their assistant through WhatsApp/SMS
+- understand outbound sales automation as part of the revenue engine
