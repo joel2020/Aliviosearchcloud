@@ -38,7 +38,7 @@ function PostCard({ post }: { post: BlogPost }) {
           src={cover.src}
           srcSet={cover.srcSet}
           sizes={cover.sizes}
-          alt=""
+          alt={`Cover image for ${post.title}`}
           loading="lazy"
           decoding="async"
           width={1200}

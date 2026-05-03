@@ -29,6 +29,13 @@
       "when": 1777800158477,
       "tag": "0003_misty_zaran",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777804630168,
+      "tag": "0004_ancient_owl",
+      "breakpoints": true
     }
   ]
 }
