@@ -216,6 +216,31 @@ function ClerkProviderWithRoutes() {
             <Route path="/install">
               <Redirect to="/contact" />
             </Route>
+            {/* Alias routes so common entry points don't 404. */}
+            <Route path="/login">
+              <Redirect to="/sign-in" />
+            </Route>
+            <Route path="/portal">
+              <Redirect to="/dashboard" />
+            </Route>
+            <Route path="/admin">
+              <Redirect to="/dashboard" />
+            </Route>
+            <Route path="/demo">
+              <Redirect to="/contact" />
+            </Route>
+            <Route path="/services">
+              <Redirect to="/agents" />
+            </Route>
+            <Route path="/industries">
+              <Redirect to="/agents" />
+            </Route>
+            <Route path="/apply">
+              <Redirect to="/contact" />
+            </Route>
+            <Route path="/ai-revenue-engine">
+              <Redirect to="/" />
+            </Route>
             <Route path="/assistant">
               <ProtectedShell><AssistantPage /></ProtectedShell>
             </Route>

@@ -207,12 +207,11 @@ export default function Home() {
             
             <div className="flex flex-col md:flex-row gap-12 relative z-10">
               <div className="flex-1">
-                <div className="inline-block rounded-full bg-accent/20 text-accent px-3 py-1 text-xs font-bold tracking-wider uppercase mb-6">Premium Setup</div>
+                <div className="inline-block rounded-full bg-accent/20 text-accent px-3 py-1 text-xs font-bold tracking-wider uppercase mb-6">Done-For-You Setup</div>
                 <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">10-Day AI Revenue Engine</h2>
-                <div className="space-y-2 mb-8">
-                  <p className="text-2xl font-light text-foreground">$2,500–$5,000 <span className="text-lg text-muted-foreground">implementation</span></p>
-                  <p className="text-xl font-light text-foreground">$750–$1,500/month <span className="text-lg text-muted-foreground">optimization</span></p>
-                </div>
+                <p className="text-lg text-muted-foreground mb-8">
+                  We deploy all 12 agents, integrate your channels, and train the system on your business — live and generating revenue in 10 days.
+                </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">

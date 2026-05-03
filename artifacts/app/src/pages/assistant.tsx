@@ -105,7 +105,7 @@ const SUGGESTIONS: { mode: AgentMode; prompts: string[] }[] = [
     prompts: [
       "Write a 3-step cold email sequence for accounting firms.",
       "Suggest 5 LinkedIn outreach openers for HVAC owners.",
-      "Build me a list of objection responses for pricing.",
+      "Build me a list of common sales objection responses.",
     ],
   },
   {
@@ -113,7 +113,7 @@ const SUGGESTIONS: { mode: AgentMode; prompts: string[] }[] = [
     prompts: [
       "Plan a 5-touch follow-up for an inbound demo no-show.",
       "Write a soft check-in for a deal that went quiet.",
-      "Suggest the right cadence for a $25k proposal.",
+      "Suggest the right cadence for a high-value proposal.",
     ],
   },
   {
@@ -121,7 +121,7 @@ const SUGGESTIONS: { mode: AgentMode; prompts: string[] }[] = [
     prompts: [
       "Draft a proposal outline for a 10-day AI engine engagement.",
       "Strengthen the ROI section of a proposal.",
-      "Write a 3-tier pricing block.",
+      "Write an executive summary for a consulting proposal.",
     ],
   },
   {
