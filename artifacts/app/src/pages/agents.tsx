@@ -81,10 +81,9 @@ export default function AgentsPage() {
                         </span>
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="pointer-events-none opacity-90 group-hover:opacity-100"
+                          className="pointer-events-none opacity-95 group-hover:opacity-100"
                         >
-                          Open
+                          Run agent
                         </Button>
                       </div>
                     </CardContent>

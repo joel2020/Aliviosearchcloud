@@ -1,7 +1,6 @@
 import { Router, type IRouter } from "express";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { db, agentRunsTable } from "@workspace/db";
-import { agentRegistry } from "@workspace/agents";
 import { requireAuth } from "../middlewares/requireAuth";
 import { ensureUser, ensureBusiness } from "../lib/ensure";
 import { serializeAgentRun } from "../lib/agentRunStore";
@@ -137,9 +136,6 @@ router.get("/summary", requireAuth, async (req, res, next) => {
       recentRuns: recentRunsRows.map(serializeAgentRun),
       suggestedActions: suggestions,
     });
-
-    // Touch registry so unused-import lint doesn't fire if list later moves.
-    void agentRegistry;
   } catch (err) {
     next(err);
   }

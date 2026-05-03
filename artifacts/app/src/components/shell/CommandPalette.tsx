@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import {
   CommandDialog,
   CommandEmpty,
@@ -15,10 +16,9 @@ import {
   MessageSquare,
   Search,
   Settings,
-  Bot,
   Activity,
 } from "lucide-react";
-import { useSearchWorkspace } from "@workspace/api-client-react";
+import { getSearchWorkspaceQueryOptions } from "@workspace/api-client-react";
 import { agentMeta } from "@/lib/agentMeta";
 
 interface CommandPaletteProps {
@@ -53,16 +53,11 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     if (!open) setQuery("");
   }, [open]);
 
-  const { data } = useSearchWorkspace(
-    { q: debounced || "" },
-    {
-      query: {
-        enabled: open && debounced.length > 0,
-        staleTime: 5_000,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
-    },
-  );
+  const { data } = useQuery({
+    ...getSearchWorkspaceQueryOptions({ q: debounced || "_" }),
+    enabled: open && debounced.length > 0,
+    staleTime: 5_000,
+  });
 
   function go(href: string) {
     onOpenChange(false);
@@ -197,5 +192,3 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     </CommandDialog>
   );
 }
-
-void Bot;

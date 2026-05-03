@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Search as SearchIcon, ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import {
-  useSearchWorkspace,
+  getSearchWorkspaceQueryOptions,
   type SearchResults,
 } from "@workspace/api-client-react";
 import { Input } from "@/components/ui/input";
@@ -31,13 +32,10 @@ export default function SearchPage() {
   const [q, setQ] = useState("");
   const debounced = useDebounced(q.trim(), 250);
 
-  const { data, isFetching } = useSearchWorkspace(
-    { q: debounced || "" },
-    {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      query: { enabled: debounced.length > 0 } as any,
-    },
-  );
+  const { data, isFetching } = useQuery({
+    ...getSearchWorkspaceQueryOptions({ q: debounced || "_" }),
+    enabled: debounced.length > 0,
+  });
 
   return (
     <div className="space-y-8" data-testid="page-search">
