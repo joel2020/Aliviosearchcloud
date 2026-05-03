@@ -286,6 +286,18 @@ function MessagingSection() {
                     ) : (
                       <Badge variant="outline">Pending</Badge>
                     )}
+                    {!c.verified && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setPendingId(c.id);
+                          setCode("");
+                        }}
+                      >
+                        Enter code
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="ghost"

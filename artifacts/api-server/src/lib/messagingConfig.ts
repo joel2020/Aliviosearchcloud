@@ -40,6 +40,17 @@ function readEnv(key: string): string | null {
  * or null when Twilio is not configured. Callers must handle the null
  * case as "messaging not configured" — never throw.
  */
+/**
+ * Strip a leading "whatsapp:" channel prefix if the operator already
+ * included one in TWILIO_WHATSAPP_FROM. The send path always re-adds
+ * the prefix, so storing the bare E.164 number internally avoids the
+ * "whatsapp:whatsapp:+1…" double-prefix class of misconfiguration.
+ */
+function normalizeWhatsappFrom(raw: string | null): string | null {
+  if (!raw) return null;
+  return raw.replace(/^whatsapp:/i, "").trim() || null;
+}
+
 export function getTwilioConfig(): TwilioConfig | null {
   const accountSid = readEnv("TWILIO_ACCOUNT_SID");
   const authToken = readEnv("TWILIO_AUTH_TOKEN");
@@ -47,7 +58,7 @@ export function getTwilioConfig(): TwilioConfig | null {
   return {
     accountSid,
     authToken,
-    whatsappFrom: readEnv("TWILIO_WHATSAPP_FROM"),
+    whatsappFrom: normalizeWhatsappFrom(readEnv("TWILIO_WHATSAPP_FROM")),
     smsFrom: readEnv("TWILIO_SMS_FROM"),
     publicAppUrl: readEnv("PUBLIC_APP_URL"),
   };
