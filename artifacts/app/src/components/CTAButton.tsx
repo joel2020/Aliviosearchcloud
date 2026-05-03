@@ -9,7 +9,12 @@ import { Button, type ButtonProps } from "@/components/ui/button";
  * `book-call` and `install` route to public Stripe/Cal links when configured,
  * otherwise to /contact with a "Coming soon — contact us" label.
  */
-export type CTAId = "audit" | "book-call" | "install" | "assistant";
+export type CTAId =
+  | "audit"
+  | "audit-paid"
+  | "book-call"
+  | "install"
+  | "assistant";
 
 type CTAButtonProps = Omit<ButtonProps, "asChild" | "onClick"> & {
   cta: CTAId;
@@ -27,6 +32,7 @@ const FALLBACK_HREF = "/contact";
 
 const DEFAULT_LABELS: Record<CTAId, string> = {
   audit: "Run Free Revenue Audit",
+  "audit-paid": "Upgrade to Paid Audit",
   "book-call": "Book Strategy Call",
   install: "Install My Revenue Engine",
   assistant: "Talk to My AI Assistant",
@@ -95,13 +101,14 @@ function resolveCta(
 ): ResolvedCta {
   switch (cta) {
     case "audit": {
-      // Audit always goes to the in-app sign-up flow; the *paid* upgrade is
-      // a separate CTA that can adopt the audit Stripe link when present.
-      const auditLink = config?.stripe?.auditLink ?? null;
-      if (auditLink) {
-        return { href: auditLink, external: true, fallback: false };
-      }
+      // The FREE audit CTA always routes to the in-app audit flow — never to
+      // a Stripe payment link. The paid upgrade is a separate `audit-paid` CTA.
       return { href: "/sign-up?intent=audit", external: false, fallback: false };
+    }
+    case "audit-paid": {
+      const auditLink = config?.stripe?.auditLink ?? null;
+      if (auditLink) return { href: auditLink, external: true, fallback: false };
+      return { href: FALLBACK_HREF, external: false, fallback: true };
     }
     case "book-call": {
       const link = config?.cal?.link ?? null;

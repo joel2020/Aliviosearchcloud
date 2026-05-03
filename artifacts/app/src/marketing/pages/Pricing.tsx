@@ -73,6 +73,13 @@ export default function Pricing() {
                   className="w-full text-lg h-14 font-semibold shadow-xl shadow-primary/20"
                   data-testid="cta-install-pricing"
                 />
+                <CTAButton
+                  cta="audit-paid"
+                  variant="outline"
+                  size="lg"
+                  className="w-full text-base h-12 mt-3"
+                  data-testid="cta-audit-paid-pricing"
+                />
               </div>
               
               <div className="flex-1 md:border-l md:border-border/50 md:pl-12">

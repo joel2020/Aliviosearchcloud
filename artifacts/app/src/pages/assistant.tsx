@@ -48,6 +48,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { CTAButton } from "@/components/CTAButton";
 import { PageHeader } from "@/components/shell/PageHeader";
 
 type AgentMode = AssistantConversation["agentMode"];
@@ -702,6 +703,29 @@ export default function AssistantPage() {
                     <div className="text-xs text-muted-foreground">
                       Pick a starting prompt — or just type one in.
                     </div>
+                  </div>
+                  <div
+                    className="flex flex-wrap items-center justify-center gap-2"
+                    data-testid="assistant-suggested-actions"
+                  >
+                    <CTAButton
+                      cta="book-call"
+                      size="sm"
+                      variant="outline"
+                      data-testid="cta-book-call-assistant"
+                    />
+                    <CTAButton
+                      cta="install"
+                      size="sm"
+                      variant="outline"
+                      data-testid="cta-install-assistant"
+                    />
+                    <CTAButton
+                      cta="audit"
+                      size="sm"
+                      variant="outline"
+                      data-testid="cta-audit-assistant"
+                    />
                   </div>
                   <div className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-2">
                     {suggestionList.map((p) => (
