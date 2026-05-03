@@ -1,0 +1,35 @@
+2026-05-03T01:17:53.0695283Z   /  _  \ __________ _________   ____
+2026-05-03T01:17:53.0695322Z  /  /_\  \\___   /  |  \_  __ \_/ __ \
+2026-05-03T01:17:53.069535Z /    |    \/    /|  |  /|  | \/\  ___/
+2026-05-03T01:17:53.0695377Z \____|__  /_____ \____/ |__|    \___  >
+2026-05-03T01:17:53.0695403Z         \/      \/                  \/
+2026-05-03T01:17:53.0695429Z A P P   S E R V I C E   O N   L I N U X
+2026-05-03T01:17:53.0695454Z
+2026-05-03T01:17:53.0695485Z Documentation    : http://aka.ms/webapp-linux
+2026-05-03T01:17:53.0695514Z Python quickstart: https://aka.ms/python-qs
+2026-05-03T01:17:53.069578Z Python version   : 3.11.14
+2026-05-03T01:17:53.0695814Z Instance Name    : lw1sdlwk000I9A
+2026-05-03T01:17:53.0695845Z Instance Id      : cb8d91c9d2a29a2894b5445bbfe9d306e91eb996b4b7cdada5ff30dc3f2bfdda
+2026-05-03T01:17:53.069587Z
+2026-05-03T01:17:53.0695897Z Note: Any data outside '/home' is not persisted
+2026-05-03T01:17:54.9245587Z Starting OpenBSD Secure Shell server: sshd.
+2026-05-03T01:17:54.9533446Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2026-05-03T01:17:55.0308078Z Updating certificates in /etc/ssl/certs...
+2026-05-03T01:18:18.3619553Z rehash: warning: skipping duplicate certificate in azl_Sectigo_Public_Server_Authentication_Root_E46.pem
+2026-05-03T01:18:18.3620046Z rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_ECC_Root_CA_2022.pem
+2026-05-03T01:18:18.3620082Z rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_RSA_Root_CA_2022.pem
+2026-05-03T01:18:18.4403888Z rehash: warning: skipping duplicate certificate in azl_Sectigo_Public_Server_Authentication_Root_R46.pem
+2026-05-03T01:18:18.4816534Z 4 added, 0 removed; done.
+2026-05-03T01:18:18.5118521Z Running hooks in /etc/ca-certificates/update.d...
+2026-05-03T01:18:18.5481164Z done.
+2026-05-03T01:18:18.5812451Z CA certificates copied and updated successfully.
+2026-05-03T01:18:18.8072349Z Site's appCommandLine: uvicorn server:app --host 0.0.0.0 --port 8000
+2026-05-03T01:18:19.3812619Z Starting periodic command scheduler: cron.
+2026-05-03T01:18:19.3830055Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'uvicorn server:app --host 0.0.0.0 --port 8000'
+2026-05-03T01:18:19.8694273Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2026-05-03T01:18:19.8791417Z Build Operation ID: febf26534b130b25
+2026-05-03T01:18:19.880809Z Oryx Version: 0.2.20260130.1, Commit: a98e9aef5dfb6572a08b0a07ce414e1122ab4a2e, ReleaseTagName: 20260130.1
+2026-05-03T01:18:19.8813413Z Output is compressed. Extracting it...
+2026-05-03T01:18:19.8909041Z Found zstd-compressed tarball.
+2026-05-03T01:18:19.8909187Z Extracting '/home/site/wwwroot/output.tar.zst' to directory '/tmp/8dea8ae6d80407f'...
+2026-05-03T01:18:19.8909225Z Using zstd for decompression of file: /home/site/wwwroot/output.tar.zst
