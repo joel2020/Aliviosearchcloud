@@ -237,6 +237,83 @@ export interface SmokeTestResult {
   preview?: string | null;
 }
 
+export type AssistantAgentMode =
+  (typeof AssistantAgentMode)[keyof typeof AssistantAgentMode];
+
+export const AssistantAgentMode = {
+  general: "general",
+  revenue_recovery: "revenue_recovery",
+  outbound_sales: "outbound_sales",
+  follow_up: "follow_up",
+  proposal: "proposal",
+  seo_content: "seo_content",
+} as const;
+
+export interface AssistantConversation {
+  id: string;
+  businessId: string;
+  userId: string;
+  title?: string | null;
+  channel: string;
+  agentMode: AssistantAgentMode;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AssistantMessageRole =
+  (typeof AssistantMessageRole)[keyof typeof AssistantMessageRole];
+
+export const AssistantMessageRole = {
+  user: "user",
+  assistant: "assistant",
+  system: "system",
+  tool: "tool",
+} as const;
+
+export type AssistantMessageMetadata = { [key: string]: unknown } | null;
+
+export interface AssistantMessage {
+  id: string;
+  conversationId: string;
+  userId: string;
+  businessId: string;
+  channel: string;
+  role: AssistantMessageRole;
+  content: string;
+  agentMode?: string | null;
+  metadata?: AssistantMessageMetadata;
+  createdAt: string;
+}
+
+export interface AssistantConversationWithMessages {
+  conversation: AssistantConversation;
+  messages: AssistantMessage[];
+}
+
+export interface CreateAssistantConversationInput {
+  /** @maxLength 200 */
+  title?: string;
+  agentMode?: AssistantAgentMode;
+}
+
+export interface PostAssistantMessageInput {
+  /**
+   * @minLength 1
+   * @maxLength 4000
+   */
+  content: string;
+  agentMode?: AssistantAgentMode;
+  /** When true, the previous assistant message is replaced rather than a new user message being appended. */
+  regenerate?: boolean;
+}
+
+export interface AssistantMessagePairResponse {
+  conversation: AssistantConversation;
+  userMessage?: AssistantMessage | null;
+  assistantMessage: AssistantMessage;
+  suggestedActions?: string[];
+}
+
 export interface SmokeTestReport {
   runAt: string;
   passed: number;

@@ -327,6 +327,196 @@ export const GetAgentRunResponse = zod.object({
 });
 
 /**
+ * @summary List the current user's assistant conversations
+ */
+export const ListAssistantConversationsResponseItem = zod.object({
+  id: zod.string(),
+  businessId: zod.string(),
+  userId: zod.string(),
+  title: zod.string().nullish(),
+  channel: zod.string(),
+  agentMode: zod.enum([
+    "general",
+    "revenue_recovery",
+    "outbound_sales",
+    "follow_up",
+    "proposal",
+    "seo_content",
+  ]),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+export const ListAssistantConversationsResponse = zod.array(
+  ListAssistantConversationsResponseItem,
+);
+
+/**
+ * @summary Create a new assistant conversation
+ */
+export const createAssistantConversationBodyTitleMax = 200;
+
+export const CreateAssistantConversationBody = zod.object({
+  title: zod.string().max(createAssistantConversationBodyTitleMax).optional(),
+  agentMode: zod
+    .enum([
+      "general",
+      "revenue_recovery",
+      "outbound_sales",
+      "follow_up",
+      "proposal",
+      "seo_content",
+    ])
+    .optional(),
+});
+
+export const CreateAssistantConversationResponse = zod.object({
+  id: zod.string(),
+  businessId: zod.string(),
+  userId: zod.string(),
+  title: zod.string().nullish(),
+  channel: zod.string(),
+  agentMode: zod.enum([
+    "general",
+    "revenue_recovery",
+    "outbound_sales",
+    "follow_up",
+    "proposal",
+    "seo_content",
+  ]),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Get a single conversation with all of its messages
+ */
+export const GetAssistantConversationParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const GetAssistantConversationResponse = zod.object({
+  conversation: zod.object({
+    id: zod.string(),
+    businessId: zod.string(),
+    userId: zod.string(),
+    title: zod.string().nullish(),
+    channel: zod.string(),
+    agentMode: zod.enum([
+      "general",
+      "revenue_recovery",
+      "outbound_sales",
+      "follow_up",
+      "proposal",
+      "seo_content",
+    ]),
+    createdAt: zod.coerce.date(),
+    updatedAt: zod.coerce.date(),
+  }),
+  messages: zod.array(
+    zod.object({
+      id: zod.string(),
+      conversationId: zod.string(),
+      userId: zod.string(),
+      businessId: zod.string(),
+      channel: zod.string(),
+      role: zod.enum(["user", "assistant", "system", "tool"]),
+      content: zod.string(),
+      agentMode: zod.string().nullish(),
+      metadata: zod.record(zod.string(), zod.unknown()).nullish(),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+});
+
+/**
+ * @summary Soft-delete a conversation
+ */
+export const DeleteAssistantConversationParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+/**
+ * Persists the user message, runs the Business Assistant agent against
+full business context, persists the assistant reply, and returns the
+updated message pair. SSE streaming may be added behind the same path
+in a future revision; this JSON variant is the always-supported fallback.
+
+ * @summary Send a user message and get the assistant reply
+ */
+export const PostAssistantMessageParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const postAssistantMessageBodyContentMax = 4000;
+
+export const PostAssistantMessageBody = zod.object({
+  content: zod.string().min(1).max(postAssistantMessageBodyContentMax),
+  agentMode: zod
+    .enum([
+      "general",
+      "revenue_recovery",
+      "outbound_sales",
+      "follow_up",
+      "proposal",
+      "seo_content",
+    ])
+    .optional(),
+  regenerate: zod
+    .boolean()
+    .optional()
+    .describe(
+      "When true, the previous assistant message is replaced rather than a new user message being appended.",
+    ),
+});
+
+export const PostAssistantMessageResponse = zod.object({
+  conversation: zod.object({
+    id: zod.string(),
+    businessId: zod.string(),
+    userId: zod.string(),
+    title: zod.string().nullish(),
+    channel: zod.string(),
+    agentMode: zod.enum([
+      "general",
+      "revenue_recovery",
+      "outbound_sales",
+      "follow_up",
+      "proposal",
+      "seo_content",
+    ]),
+    createdAt: zod.coerce.date(),
+    updatedAt: zod.coerce.date(),
+  }),
+  userMessage: zod
+    .object({
+      id: zod.string(),
+      conversationId: zod.string(),
+      userId: zod.string(),
+      businessId: zod.string(),
+      channel: zod.string(),
+      role: zod.enum(["user", "assistant", "system", "tool"]),
+      content: zod.string(),
+      agentMode: zod.string().nullish(),
+      metadata: zod.record(zod.string(), zod.unknown()).nullish(),
+      createdAt: zod.coerce.date(),
+    })
+    .nullish(),
+  assistantMessage: zod.object({
+    id: zod.string(),
+    conversationId: zod.string(),
+    userId: zod.string(),
+    businessId: zod.string(),
+    channel: zod.string(),
+    role: zod.enum(["user", "assistant", "system", "tool"]),
+    content: zod.string(),
+    agentMode: zod.string().nullish(),
+    metadata: zod.record(zod.string(), zod.unknown()).nullish(),
+    createdAt: zod.coerce.date(),
+  }),
+  suggestedActions: zod.array(zod.string()).optional(),
+});
+
+/**
  * @summary Smoke-test every agent (admin only)
  */
 export const SmokeTestAgentsResponse = zod.object({

@@ -26,6 +26,8 @@ tags:
     description: Customer dashboard summary
   - name: search
     description: Cross-workspace search
+  - name: assistant
+    description: Business Assistant chat
 paths:
   /healthz:
     get:
@@ -311,6 +313,169 @@ paths:
                 $ref: "#/components/schemas/AgentRun"
         "404":
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /assistant/conversations:
+    get:
+      operationId: listAssistantConversations
+      tags: [assistant]
+      summary: List the current user's assistant conversations
+      responses:
+        "200":
+          description: Conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssistantConversation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createAssistantConversation
+      tags: [assistant]
+      summary: Create a new assistant conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAssistantConversationInput"
+      responses:
+        "200":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantConversation"
+        "400":
+          description: Invalid body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /assistant/conversations/{id}:
+    get:
+      operationId: getAssistantConversation
+      tags: [assistant]
+      summary: Get a single conversation with all of its messages
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantConversationWithMessages"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteAssistantConversation
+      tags: [assistant]
+      summary: Soft-delete a conversation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /assistant/conversations/{id}/messages:
+    post:
+      operationId: postAssistantMessage
+      tags: [assistant]
+      summary: Send a user message and get the assistant reply
+      description: |
+        Persists the user message, runs the Business Assistant agent against
+        full business context, persists the assistant reply, and returns the
+        updated message pair. SSE streaming may be added behind the same path
+        in a future revision; this JSON variant is the always-supported fallback.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostAssistantMessageInput"
+      responses:
+        "200":
+          description: User + assistant message pair
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantMessagePairResponse"
+        "400":
+          description: Invalid body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Assistant not configured
           content:
             application/json:
               schema:
@@ -712,6 +877,110 @@ components:
           type: string
           nullable: true
       required: [id, name, status, latencyMs]
+    AssistantAgentMode:
+      type: string
+      enum:
+        [general, revenue_recovery, outbound_sales, follow_up, proposal, seo_content]
+    AssistantConversation:
+      type: object
+      properties:
+        id:
+          type: string
+        businessId:
+          type: string
+        userId:
+          type: string
+        title:
+          type: string
+          nullable: true
+        channel:
+          type: string
+        agentMode:
+          $ref: "#/components/schemas/AssistantAgentMode"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        [id, businessId, userId, channel, agentMode, createdAt, updatedAt]
+    AssistantMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        conversationId:
+          type: string
+        userId:
+          type: string
+        businessId:
+          type: string
+        channel:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant, system, tool]
+        content:
+          type: string
+        agentMode:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        [id, conversationId, userId, businessId, channel, role, content, createdAt]
+    AssistantConversationWithMessages:
+      type: object
+      properties:
+        conversation:
+          $ref: "#/components/schemas/AssistantConversation"
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssistantMessage"
+      required: [conversation, messages]
+    CreateAssistantConversationInput:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        agentMode:
+          $ref: "#/components/schemas/AssistantAgentMode"
+    PostAssistantMessageInput:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        agentMode:
+          $ref: "#/components/schemas/AssistantAgentMode"
+        regenerate:
+          type: boolean
+          description: When true, the previous assistant message is replaced rather than a new user message being appended.
+      required: [content]
+    AssistantMessagePairResponse:
+      type: object
+      properties:
+        conversation:
+          $ref: "#/components/schemas/AssistantConversation"
+        userMessage:
+          $ref: "#/components/schemas/AssistantMessage"
+          nullable: true
+        assistantMessage:
+          $ref: "#/components/schemas/AssistantMessage"
+        suggestedActions:
+          type: array
+          items:
+            type: string
+      required: [conversation, assistantMessage]
     SmokeTestReport:
       type: object
       properties:
