@@ -404,14 +404,50 @@ router.post("/connections", requireAuth, async (req, res, next) => {
       });
       return;
     }
+    if (existing[0]?.verified) {
+      // Don't silently downgrade a verified row — caller must DELETE first
+      // and reconnect to rotate. Avoids interrupting live message routing.
+      res.status(409).json({
+        error: "already_verified",
+        message:
+          "That phone number is already verified for this workspace. Disconnect it first to re-verify.",
+      });
+      return;
+    }
 
     const code = generateOtp();
     const codeHash = hashCode(code);
     const expiresAt = new Date(Date.now() + VERIFICATION_TTL_MS);
 
+    // Send OTP via Twilio FIRST — only persist the pending row if the carrier
+    // accepts the message. This prevents stale "pending" connections from
+    // accumulating when the number is invalid/unreachable.
+    try {
+      const client = twilio(cfg.accountSid, cfg.authToken);
+      const from =
+        channel === "whatsapp"
+          ? `whatsapp:${cfg.whatsappFrom}`
+          : (cfg.smsFrom as string);
+      const to =
+        channel === "whatsapp" ? `whatsapp:${phoneNumber}` : phoneNumber;
+      await client.messages.create({
+        from,
+        to,
+        body: `Your Alivio verification code is ${code}. It expires in 10 minutes.`,
+      });
+    } catch (err) {
+      req.log.error({ err }, "twilio: failed to send verification OTP");
+      res.status(502).json({
+        error: "send_failed",
+        message:
+          "Couldn't send the verification code. Double-check the phone number and try again.",
+      });
+      return;
+    }
+
     let row: AssistantChannelConnection;
     if (existing[0] && existing[0].businessId === business.id) {
-      // Re-issue OTP for an existing pending connection
+      // Re-issue OTP for an existing pending (unverified) connection.
       const updated = await db
         .update(assistantChannelConnectionsTable)
         .set({
@@ -443,30 +479,6 @@ router.post("/connections", requireAuth, async (req, res, next) => {
         })
         .returning();
       row = inserted[0]!;
-    }
-
-    // Send OTP via Twilio.
-    try {
-      const client = twilio(cfg.accountSid, cfg.authToken);
-      const from =
-        channel === "whatsapp"
-          ? `whatsapp:${cfg.whatsappFrom}`
-          : (cfg.smsFrom as string);
-      const to =
-        channel === "whatsapp" ? `whatsapp:${phoneNumber}` : phoneNumber;
-      await client.messages.create({
-        from,
-        to,
-        body: `Your Alivio verification code is ${code}. It expires in 10 minutes.`,
-      });
-    } catch (err) {
-      req.log.error({ err }, "twilio: failed to send verification OTP");
-      res.status(502).json({
-        error: "send_failed",
-        message:
-          "Couldn't send the verification code. Double-check the phone number and try again.",
-      });
-      return;
     }
 
     res.json(serializeConnection(row));
