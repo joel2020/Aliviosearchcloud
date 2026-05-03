@@ -72,24 +72,43 @@ export default function Home() {
       {/* Problem Section */}
       <section className="border-t border-border/40 bg-card/30 px-6 py-24">
         <div className="mx-auto max-w-3xl text-center">
-          <Target className="h-12 w-12 text-destructive mx-auto mb-6 opacity-80" />
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6 text-balance">
-            Most businesses don't have a lead problem. They have a response and follow-up problem.
-          </h2>
-          <p className="text-lg text-muted-foreground text-balance">
-            Every missed call, delayed email, and forgotten follow-up is money left on the table. You're spending on marketing, but losing the revenue in the gaps. Alivio plugs the leaks instantly.
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+          >
+            <Target className="h-12 w-12 text-destructive mx-auto mb-6 opacity-80" />
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6 text-balance">
+              Most businesses don't have a lead problem. They have a response and follow-up problem.
+            </h2>
+            <p className="text-lg text-muted-foreground text-balance">
+              Every missed call, delayed email, and forgotten follow-up is money left on the table. You're spending on marketing, but losing the revenue in the gaps. Alivio plugs the leaks instantly.
+            </p>
+          </motion.div>
         </div>
       </section>
 
       {/* The System */}
       <section className="px-6 py-24 md:py-32">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-16">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6 }}
+          >
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">The System</h2>
             <p className="text-muted-foreground text-lg">A complete loop to maximize every opportunity.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          </motion.div>
+          <motion.div
+            className="grid md:grid-cols-3 gap-8"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             <div className="rounded-2xl border border-border/50 bg-card p-8 hover-elevate">
               <div className="h-12 w-12 rounded-lg bg-primary/20 text-primary flex items-center justify-center mb-6">
                 <Target className="h-6 w-6" />
@@ -126,7 +145,7 @@ export default function Home() {
                 Powered by: Outbound Sales, LinkedIn Outreach, Cold Email, SEO Content, Revenue Leak
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -157,7 +176,13 @@ export default function Home() {
 
       {/* Audit CTA Band */}
       <section className="relative px-6 py-24 overflow-hidden bg-primary/5 border-y border-primary/20">
-        <div className="mx-auto max-w-4xl text-center relative z-10">
+        <motion.div
+          className="mx-auto max-w-4xl text-center relative z-10"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-8 text-balance">
             See how much revenue you are losing before another lead disappears.
           </h2>
@@ -166,7 +191,7 @@ export default function Home() {
               {CTA_AUDIT.label}
             </Button>
           </Link>
-        </div>
+        </motion.div>
       </section>
 
       {/* Offer Card */}

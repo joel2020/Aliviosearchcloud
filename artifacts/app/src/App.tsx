@@ -89,7 +89,7 @@ function ProtectedShell({ children }: { children: ReactNode }) {
         <AppShell>{children}</AppShell>
       </Show>
       <Show when="signed-out">
-        <Redirect to="/" />
+        <Redirect to="/sign-in" />
       </Show>
     </>
   );
