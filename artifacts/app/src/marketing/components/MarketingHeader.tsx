@@ -136,6 +136,7 @@ export function MarketingHeader() {
                   size="lg"
                   label="Run Free Audit"
                   className="w-full font-semibold shadow-md"
+                  onNavigate={() => setIsOpen(false)}
                   data-testid="cta-audit-header-mobile"
                 />
               </div>

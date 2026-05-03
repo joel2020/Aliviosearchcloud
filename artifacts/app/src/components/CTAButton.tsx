@@ -25,6 +25,11 @@ type CTAButtonProps = Omit<ButtonProps, "asChild" | "onClick"> & {
   trailing?: ReactNode;
   /** When true and the user is not signed in, route the assistant CTA to sign-in. */
   signedIn?: boolean;
+  /**
+   * Side-effect to run when the CTA is clicked (e.g. closing a mobile menu
+   * sheet). Navigation still happens via the underlying anchor / wouter Link.
+   */
+  onNavigate?: () => void;
   "data-testid"?: string;
 };
 
@@ -44,6 +49,7 @@ export function CTAButton({
   label,
   trailing,
   signedIn,
+  onNavigate,
   className,
   "data-testid": testId,
   children,
@@ -82,6 +88,7 @@ export function CTAButton({
         href={resolved.href}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={onNavigate}
         data-testid={`${finalTestId}-link`}
       >
         {inner}
@@ -90,7 +97,11 @@ export function CTAButton({
   }
 
   return (
-    <Link href={resolved.href} data-testid={`${finalTestId}-link`}>
+    <Link
+      href={resolved.href}
+      onClick={onNavigate}
+      data-testid={`${finalTestId}-link`}
+    >
       {inner}
     </Link>
   );
