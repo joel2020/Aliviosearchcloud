@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type MouseEvent, type ReactNode } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@clerk/react";
 import { useGetPublicConfig } from "@workspace/api-client-react";
@@ -65,6 +65,12 @@ export function CTAButton({
   // default label (not the "Coming soon" string) to avoid a visible flicker
   // when the link is actually configured.
   const showFallbackLabel = resolved.fallback && !configLoading;
+  // Disable the link-dependent CTAs while config is still loading, so a fast
+  // click can't navigate to the /contact fallback when the real link is about
+  // to resolve in. In-app CTAs (audit, assistant) are not link-dependent.
+  const linkDependent =
+    cta === "book-call" || cta === "install" || cta === "audit-paid";
+  const isPending = linkDependent && configLoading;
   const visibleLabel = showFallbackLabel
     ? FALLBACK_LABEL
     : (label ?? DEFAULT_LABELS[cta]);
@@ -74,13 +80,29 @@ export function CTAButton({
     <Button
       {...buttonProps}
       className={className}
+      disabled={buttonProps.disabled || isPending}
       data-testid={finalTestId}
-      data-cta-state={resolved.fallback ? "fallback" : "wired"}
+      data-cta-state={
+        isPending ? "loading" : resolved.fallback ? "fallback" : "wired"
+      }
+      aria-busy={isPending || undefined}
     >
       {children ?? visibleLabel}
       {trailing}
     </Button>
   );
+
+  // While config is still loading for a link-dependent CTA, render the button
+  // without an anchor wrapper so an early click can't navigate anywhere.
+  if (isPending) return inner;
+
+  const handleClick = (e: MouseEvent) => {
+    if (isPending) {
+      e.preventDefault();
+      return;
+    }
+    onNavigate?.();
+  };
 
   if (resolved.external) {
     return (
@@ -88,7 +110,7 @@ export function CTAButton({
         href={resolved.href}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={onNavigate}
+        onClick={handleClick}
         data-testid={`${finalTestId}-link`}
       >
         {inner}
@@ -99,7 +121,7 @@ export function CTAButton({
   return (
     <Link
       href={resolved.href}
-      onClick={onNavigate}
+      onClick={handleClick}
       data-testid={`${finalTestId}-link`}
     >
       {inner}
