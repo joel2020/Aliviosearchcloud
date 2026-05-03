@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { AgentInputField } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -104,6 +104,13 @@ export function AgentForm({
   const initial = useMemo(() => buildInitial(fields), [fields]);
   const [state, setState] = useState<FormState>(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // When `fields` changes (e.g. after async data load or navigating between
+  // agents), reset the form so server-provided defaults populate reliably.
+  useEffect(() => {
+    setState(initial);
+    setErrors({});
+  }, [initial]);
 
   function update(name: string, value: string) {
     setState((s) => ({ ...s, [name]: value }));
