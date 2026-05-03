@@ -723,6 +723,16 @@ importers:
         version: 4.21.0
 
   scripts:
+    dependencies:
+      '@workspace/agents':
+        specifier: workspace:*
+        version: link:../lib/agents
+      '@workspace/azure-openai':
+        specifier: workspace:*
+        version: link:../lib/azure-openai
+      '@workspace/db':
+        specifier: workspace:*
+        version: link:../lib/db
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

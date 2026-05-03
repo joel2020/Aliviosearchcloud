@@ -12,5 +12,10 @@
     "@types/node": "catalog:",
     "sharp": "^0.34.5",
     "tsx": "catalog:"
+  },
+  "dependencies": {
+    "@workspace/agents": "workspace:*",
+    "@workspace/azure-openai": "workspace:*",
+    "@workspace/db": "workspace:*"
   }
 }
