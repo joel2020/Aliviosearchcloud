@@ -716,6 +716,126 @@ export const SubmitContactResponse = zod.object({
 });
 
 /**
+ * Public endpoint. Captures lead details, kicks off an AI-generated
+Revenue Leak Audit in the background, and returns an `auditId` plus
+an `accessToken` the lead can use to view their result page.
+Rate-limited per IP.
+
+ * @summary Request a free Revenue Leak Audit
+ */
+export const requestAuditBodyLeadNameMax = 120;
+
+export const requestAuditBodyLeadEmailMin = 3;
+export const requestAuditBodyLeadEmailMax = 254;
+
+export const requestAuditBodyBusinessNameMax = 200;
+
+export const requestAuditBodyWebsiteUrlMax = 500;
+
+export const requestAuditBodyPhoneMax = 40;
+
+export const requestAuditBodyIndustryMax = 120;
+
+export const requestAuditBodyMonthlyLeadsMin = 0;
+export const requestAuditBodyMonthlyLeadsMax = 1000000;
+
+export const requestAuditBodyAverageDealValueMin = 0;
+export const requestAuditBodyAverageDealValueMax = 100000000;
+
+export const requestAuditBodyCurrentResponseTimeMax = 80;
+
+export const requestAuditBodyMainChannelMax = 60;
+
+export const requestAuditBodyBiggestPainMax = 1000;
+
+export const requestAuditBodyUtmSourceMax = 80;
+
+export const requestAuditBodyUtmCampaignMax = 80;
+
+export const RequestAuditBody = zod.object({
+  leadName: zod.string().min(1).max(requestAuditBodyLeadNameMax),
+  leadEmail: zod
+    .string()
+    .email()
+    .min(requestAuditBodyLeadEmailMin)
+    .max(requestAuditBodyLeadEmailMax),
+  businessName: zod.string().min(1).max(requestAuditBodyBusinessNameMax),
+  websiteUrl: zod.string().max(requestAuditBodyWebsiteUrlMax).nullish(),
+  phone: zod.string().max(requestAuditBodyPhoneMax).nullish(),
+  industry: zod.string().max(requestAuditBodyIndustryMax).nullish(),
+  monthlyLeads: zod
+    .number()
+    .min(requestAuditBodyMonthlyLeadsMin)
+    .max(requestAuditBodyMonthlyLeadsMax)
+    .nullish(),
+  averageDealValue: zod
+    .number()
+    .min(requestAuditBodyAverageDealValueMin)
+    .max(requestAuditBodyAverageDealValueMax)
+    .nullish(),
+  currentResponseTime: zod
+    .string()
+    .max(requestAuditBodyCurrentResponseTimeMax)
+    .nullish()
+    .describe('e.g. \"<5 min\", \"1 hour\", \"1 day\", \"we miss most\"'),
+  mainChannel: zod
+    .string()
+    .max(requestAuditBodyMainChannelMax)
+    .nullish()
+    .describe("e.g. webform, phone, email, chat, ads"),
+  biggestPain: zod.string().max(requestAuditBodyBiggestPainMax).nullish(),
+  utmSource: zod.string().max(requestAuditBodyUtmSourceMax).nullish(),
+  utmCampaign: zod.string().max(requestAuditBodyUtmCampaignMax).nullish(),
+});
+
+export const RequestAuditResponse = zod.object({
+  ok: zod.boolean(),
+  auditId: zod.string(),
+  accessToken: zod.string(),
+  viewUrl: zod
+    .string()
+    .describe("Relative URL to the audit result page including token."),
+});
+
+/**
+ * @summary Get audit status and content (token-gated, public)
+ */
+export const GetAuditStatusParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const GetAuditStatusQueryParams = zod.object({
+  token: zod.coerce.string(),
+});
+
+export const GetAuditStatusResponse = zod.object({
+  id: zod.string(),
+  status: zod.enum(["pending", "generating", "ready", "failed"]),
+  leadName: zod.string(),
+  businessName: zod.string(),
+  createdAt: zod.coerce.date(),
+  emailedAt: zod.coerce.date().nullish(),
+  content: zod
+    .object({
+      leaks: zod.array(
+        zod.object({
+          title: zod.string(),
+          impact: zod.enum(["low", "medium", "high"]),
+          estimatedMonthlyLossUsd: zod.number(),
+          evidence: zod.string(),
+          fix: zod.string(),
+        }),
+      ),
+      quickWins: zod.array(zod.string()),
+      summary: zod.string(),
+      estimatedMonthlyLossUsd: zod.number().optional(),
+    })
+    .nullish(),
+  pdfUrl: zod.string().nullish(),
+  errorMessage: zod.string().nullish(),
+});
+
+/**
  * @summary Smoke-test every agent (admin only)
  */
 export const SmokeTestAgentsResponse = zod.object({

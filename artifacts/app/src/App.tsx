@@ -36,6 +36,8 @@ import MarketingAbout from "@/marketing/pages/About";
 import MarketingContact from "@/marketing/pages/Contact";
 import MarketingBlog from "@/marketing/pages/Blog";
 import MarketingBlogPost from "@/marketing/pages/BlogPost";
+import MarketingAudit from "@/marketing/pages/Audit";
+import MarketingAuditResult from "@/marketing/pages/AuditResult";
 
 const clerkPubKey = publishableKeyFromHost(
   typeof window !== "undefined" ? window.location.hostname : "",
@@ -196,6 +198,8 @@ function ClerkProviderWithRoutes() {
                 </ProtectedShell>
               )}
             </Route>
+            <Route path="/audit" component={MarketingAudit} />
+            <Route path="/audit/:id" component={MarketingAuditResult} />
             <Route path="/about" component={MarketingAbout} />
             <Route path="/contact" component={MarketingContact} />
             <Route path="/blog" component={MarketingBlog} />

@@ -23,6 +23,9 @@ import type {
   AssistantConversation,
   AssistantConversationWithMessages,
   AssistantMessagePairResponse,
+  AuditRequestInput,
+  AuditRequestResponse,
+  AuditStatusResponse,
   BlogSubscribeInput,
   BlogSubscribeResponse,
   Business,
@@ -33,6 +36,7 @@ import type {
   CurrentUser,
   DashboardSummary,
   ErrorResponse,
+  GetAuditStatusParams,
   HealthStatus,
   ListAgentRunsParams,
   MessagingConnection,
@@ -2112,6 +2116,206 @@ export const useSubmitContact = <
 > => {
   return useMutation(getSubmitContactMutationOptions(options));
 };
+
+/**
+ * Public endpoint. Captures lead details, kicks off an AI-generated
+Revenue Leak Audit in the background, and returns an `auditId` plus
+an `accessToken` the lead can use to view their result page.
+Rate-limited per IP.
+
+ * @summary Request a free Revenue Leak Audit
+ */
+export const getRequestAuditUrl = () => {
+  return `/api/audit/request`;
+};
+
+export const requestAudit = async (
+  auditRequestInput: AuditRequestInput,
+  options?: RequestInit,
+): Promise<AuditRequestResponse> => {
+  return customFetch<AuditRequestResponse>(getRequestAuditUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(auditRequestInput),
+  });
+};
+
+export const getRequestAuditMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestAudit>>,
+    TError,
+    { data: BodyType<AuditRequestInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestAudit>>,
+  TError,
+  { data: BodyType<AuditRequestInput> },
+  TContext
+> => {
+  const mutationKey = ["requestAudit"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestAudit>>,
+    { data: BodyType<AuditRequestInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestAudit(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestAuditMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestAudit>>
+>;
+export type RequestAuditMutationBody = BodyType<AuditRequestInput>;
+export type RequestAuditMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Request a free Revenue Leak Audit
+ */
+export const useRequestAudit = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestAudit>>,
+    TError,
+    { data: BodyType<AuditRequestInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof requestAudit>>,
+  TError,
+  { data: BodyType<AuditRequestInput> },
+  TContext
+> => {
+  return useMutation(getRequestAuditMutationOptions(options));
+};
+
+/**
+ * @summary Get audit status and content (token-gated, public)
+ */
+export const getGetAuditStatusUrl = (
+  id: string,
+  params: GetAuditStatusParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/audit/${id}?${stringifiedParams}`
+    : `/api/audit/${id}`;
+};
+
+export const getAuditStatus = async (
+  id: string,
+  params: GetAuditStatusParams,
+  options?: RequestInit,
+): Promise<AuditStatusResponse> => {
+  return customFetch<AuditStatusResponse>(getGetAuditStatusUrl(id, params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetAuditStatusQueryKey = (
+  id: string,
+  params?: GetAuditStatusParams,
+) => {
+  return [`/api/audit/${id}`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetAuditStatusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAuditStatus>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: string,
+  params: GetAuditStatusParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getAuditStatus>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetAuditStatusQueryKey(id, params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAuditStatus>>> = ({
+    signal,
+  }) => getAuditStatus(id, params, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAuditStatus>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetAuditStatusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAuditStatus>>
+>;
+export type GetAuditStatusQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get audit status and content (token-gated, public)
+ */
+
+export function useGetAuditStatus<
+  TData = Awaited<ReturnType<typeof getAuditStatus>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: string,
+  params: GetAuditStatusParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getAuditStatus>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetAuditStatusQueryOptions(id, params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Smoke-test every agent (admin only)

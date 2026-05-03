@@ -142,14 +142,13 @@ function resolveCta(
 ): ResolvedCta {
   switch (cta) {
     case "audit": {
-      // The FREE audit CTA always routes to the in-app audit flow — never to a
-      // Stripe payment link. Signed-in users go straight to the Revenue Leak
-      // Finder agent; signed-out users are sent to sign-up which then funnels
-      // them into the same agent.
+      // The FREE audit CTA routes to the public `/audit` form — no sign-up
+      // required. Within an hour the lead receives a branded PDF audit by
+      // email. Signed-in users still get the in-app Revenue Leak Finder.
       if (signedIn) {
         return { href: "/agents/revenue-leak", external: false, fallback: false };
       }
-      return { href: "/sign-up?intent=audit", external: false, fallback: false };
+      return { href: "/audit", external: false, fallback: false };
     }
     case "audit-paid": {
       const auditLink = config?.stripe?.auditLink ?? null;

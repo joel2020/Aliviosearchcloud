@@ -440,6 +440,110 @@ export interface ContactSubmitResponse {
   ok: boolean;
 }
 
+export interface AuditRequestInput {
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  leadName: string;
+  /**
+   * @minLength 3
+   * @maxLength 254
+   */
+  leadEmail: string;
+  /**
+   * @minLength 1
+   * @maxLength 200
+   */
+  businessName: string;
+  /** @maxLength 500 */
+  websiteUrl?: string | null;
+  /** @maxLength 40 */
+  phone?: string | null;
+  /** @maxLength 120 */
+  industry?: string | null;
+  /**
+   * @minimum 0
+   * @maximum 1000000
+   */
+  monthlyLeads?: number | null;
+  /**
+   * @minimum 0
+   * @maximum 100000000
+   */
+  averageDealValue?: number | null;
+  /**
+   * e.g. "<5 min", "1 hour", "1 day", "we miss most"
+   * @maxLength 80
+   */
+  currentResponseTime?: string | null;
+  /**
+   * e.g. webform, phone, email, chat, ads
+   * @maxLength 60
+   */
+  mainChannel?: string | null;
+  /** @maxLength 1000 */
+  biggestPain?: string | null;
+  /** @maxLength 80 */
+  utmSource?: string | null;
+  /** @maxLength 80 */
+  utmCampaign?: string | null;
+}
+
+export interface AuditRequestResponse {
+  ok: boolean;
+  auditId: string;
+  accessToken: string;
+  /** Relative URL to the audit result page including token. */
+  viewUrl: string;
+}
+
+export type AuditLeakImpact =
+  (typeof AuditLeakImpact)[keyof typeof AuditLeakImpact];
+
+export const AuditLeakImpact = {
+  low: "low",
+  medium: "medium",
+  high: "high",
+} as const;
+
+export interface AuditLeak {
+  title: string;
+  impact: AuditLeakImpact;
+  estimatedMonthlyLossUsd: number;
+  evidence: string;
+  fix: string;
+}
+
+export interface AuditContent {
+  leaks: AuditLeak[];
+  quickWins: string[];
+  summary: string;
+  estimatedMonthlyLossUsd?: number;
+}
+
+export type AuditStatusResponseStatus =
+  (typeof AuditStatusResponseStatus)[keyof typeof AuditStatusResponseStatus];
+
+export const AuditStatusResponseStatus = {
+  pending: "pending",
+  generating: "generating",
+  ready: "ready",
+  failed: "failed",
+} as const;
+
+export interface AuditStatusResponse {
+  id: string;
+  status: AuditStatusResponseStatus;
+  leadName: string;
+  businessName: string;
+  createdAt: string;
+  emailedAt?: string | null;
+  content?: AuditContent | null;
+  pdfUrl?: string | null;
+  errorMessage?: string | null;
+}
+
 export interface VerifyMessagingConnectionInput {
   /**
    * 6-digit numeric verification code
@@ -480,3 +584,7 @@ export type PostAssistantMessageStream =
 export const PostAssistantMessageStream = {
   NUMBER_1: "1",
 } as const;
+
+export type GetAuditStatusParams = {
+  token: string;
+};

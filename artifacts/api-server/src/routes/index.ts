@@ -13,6 +13,7 @@ import configRouter from "./config";
 import messagingRouter from "./messaging";
 import blogRouter from "./blog";
 import contactRouter from "./contact";
+import auditRouter from "./audit";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use("/config", configRouter);
 router.use("/messaging", messagingRouter);
 router.use("/blog", blogRouter);
 router.use("/contact", contactRouter);
+router.use("/audit", auditRouter);
 
 export default router;

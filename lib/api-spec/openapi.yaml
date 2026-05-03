@@ -699,6 +699,74 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /audit/request:
+    post:
+      operationId: requestAudit
+      tags: [audit]
+      summary: Request a free Revenue Leak Audit
+      description: |
+        Public endpoint. Captures lead details, kicks off an AI-generated
+        Revenue Leak Audit in the background, and returns an `auditId` plus
+        an `accessToken` the lead can use to view their result page.
+        Rate-limited per IP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuditRequestInput"
+      responses:
+        "200":
+          description: Audit request accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditRequestResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /audit/{id}:
+    get:
+      operationId: getAuditStatus
+      tags: [audit]
+      summary: Get audit status and content (token-gated, public)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: token
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Audit status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditStatusResponse"
+        "401":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /admin/agents/smoke-test:
     post:
       operationId: smokeTestAgents
@@ -1349,6 +1417,139 @@ components:
         ok:
           type: boolean
       required: [ok]
+    AuditRequestInput:
+      type: object
+      properties:
+        leadName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        leadEmail:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 254
+        businessName:
+          type: string
+          minLength: 1
+          maxLength: 200
+        websiteUrl:
+          type: string
+          maxLength: 500
+          nullable: true
+        phone:
+          type: string
+          maxLength: 40
+          nullable: true
+        industry:
+          type: string
+          maxLength: 120
+          nullable: true
+        monthlyLeads:
+          type: integer
+          minimum: 0
+          maximum: 1000000
+          nullable: true
+        averageDealValue:
+          type: integer
+          minimum: 0
+          maximum: 100000000
+          nullable: true
+        currentResponseTime:
+          type: string
+          maxLength: 80
+          nullable: true
+          description: e.g. "<5 min", "1 hour", "1 day", "we miss most"
+        mainChannel:
+          type: string
+          maxLength: 60
+          nullable: true
+          description: e.g. webform, phone, email, chat, ads
+        biggestPain:
+          type: string
+          maxLength: 1000
+          nullable: true
+        utmSource:
+          type: string
+          maxLength: 80
+          nullable: true
+        utmCampaign:
+          type: string
+          maxLength: 80
+          nullable: true
+      required: [leadName, leadEmail, businessName]
+    AuditRequestResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        auditId:
+          type: string
+        accessToken:
+          type: string
+        viewUrl:
+          type: string
+          description: Relative URL to the audit result page including token.
+      required: [ok, auditId, accessToken, viewUrl]
+    AuditLeak:
+      type: object
+      properties:
+        title:
+          type: string
+        impact:
+          type: string
+          enum: [low, medium, high]
+        estimatedMonthlyLossUsd:
+          type: number
+        evidence:
+          type: string
+        fix:
+          type: string
+      required: [title, impact, estimatedMonthlyLossUsd, evidence, fix]
+    AuditContent:
+      type: object
+      properties:
+        leaks:
+          type: array
+          items: { $ref: "#/components/schemas/AuditLeak" }
+        quickWins:
+          type: array
+          items: { type: string }
+        summary:
+          type: string
+        estimatedMonthlyLossUsd:
+          type: number
+      required: [leaks, quickWins, summary]
+    AuditStatusResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [pending, generating, ready, failed]
+        leadName:
+          type: string
+        businessName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        emailedAt:
+          type: string
+          format: date-time
+          nullable: true
+        content:
+          allOf:
+            - $ref: "#/components/schemas/AuditContent"
+          nullable: true
+        pdfUrl:
+          type: string
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+      required: [id, status, leadName, businessName, createdAt]
     VerifyMessagingConnectionInput:
       type: object
       properties:
