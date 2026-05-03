@@ -49,12 +49,17 @@ export function CTAButton({
   children,
   ...buttonProps
 }: CTAButtonProps) {
-  const { data: config } = useGetPublicConfig();
+  const { data: config, isLoading: configLoading } = useGetPublicConfig();
   const { isSignedIn } = useAuth();
   const effectiveSignedIn = signedIn ?? isSignedIn;
 
   const resolved = resolveCta(cta, config, effectiveSignedIn);
-  const visibleLabel = resolved.fallback
+  // While the public config is still loading we don't yet know whether
+  // book-call/install/audit-paid should be wired or fall back, so render the
+  // default label (not the "Coming soon" string) to avoid a visible flicker
+  // when the link is actually configured.
+  const showFallbackLabel = resolved.fallback && !configLoading;
+  const visibleLabel = showFallbackLabel
     ? FALLBACK_LABEL
     : (label ?? DEFAULT_LABELS[cta]);
   const finalTestId = testId ?? `cta-${cta}`;
