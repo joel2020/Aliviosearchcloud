@@ -6,7 +6,7 @@ export type SeoOptions = {
   title: string;
   /** Page-specific meta description (150–160 chars recommended). */
   description: string;
-  /** Path within the site, leading slash. e.g. "/pricing". */
+  /** Path within the site, leading slash. e.g. "/about". */
   path: string;
   /** Optional override for the OpenGraph image. Defaults to /opengraph.jpg. */
   ogImage?: string;

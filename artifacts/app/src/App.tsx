@@ -31,7 +31,6 @@ import NotFound from "@/pages/not-found";
 import { AppShell } from "@/components/shell/AppShell";
 
 import MarketingHome from "@/marketing/pages/Home";
-import MarketingPricing from "@/marketing/pages/Pricing";
 import MarketingAgents from "@/marketing/pages/Agents";
 import MarketingAbout from "@/marketing/pages/About";
 import MarketingContact from "@/marketing/pages/Contact";
@@ -197,7 +196,6 @@ function ClerkProviderWithRoutes() {
                 </ProtectedShell>
               )}
             </Route>
-            <Route path="/pricing" component={MarketingPricing} />
             <Route path="/about" component={MarketingAbout} />
             <Route path="/contact" component={MarketingContact} />
             <Route path="/blog" component={MarketingBlog} />
@@ -206,13 +204,13 @@ function ClerkProviderWithRoutes() {
             </Route>
             {/* Placeholder routes for CTAs wired by downstream tasks
                 (Stripe payment links + Cal.com booking). They render
-                the pricing page so visitors land somewhere intentional
+                the contact page so visitors land somewhere intentional
                 instead of a 404 until those integrations land. */}
             <Route path="/book-call">
-              <Redirect to="/pricing" />
+              <Redirect to="/contact" />
             </Route>
             <Route path="/install">
-              <Redirect to="/pricing" />
+              <Redirect to="/contact" />
             </Route>
             <Route path="/assistant">
               <ProtectedShell><AssistantPage /></ProtectedShell>

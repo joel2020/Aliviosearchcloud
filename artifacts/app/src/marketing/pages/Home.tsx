@@ -223,9 +223,9 @@ export default function Home() {
                       data-testid="cta-install-offer"
                     />
                   </div>
-                  <Link href="/pricing" className="flex-1">
+                  <Link href="/contact" className="flex-1">
                     <Button size="lg" variant="outline" className="w-full text-base">
-                      See full pricing
+                      Talk to us
                     </Button>
                   </Link>
                 </div>

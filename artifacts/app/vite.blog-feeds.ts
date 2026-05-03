@@ -120,7 +120,6 @@ function buildRss(posts: BlogMeta[], siteUrl: string): string {
 function buildSitemap(posts: BlogMeta[], siteUrl: string): string {
   const staticUrls = [
     { loc: "/", changefreq: "weekly", priority: "1.0" },
-    { loc: "/pricing", changefreq: "monthly", priority: "0.9" },
     { loc: "/agents", changefreq: "monthly", priority: "0.9" },
     { loc: "/about", changefreq: "monthly", priority: "0.6" },
     { loc: "/contact", changefreq: "monthly", priority: "0.6" },
