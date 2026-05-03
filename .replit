@@ -42,3 +42,4 @@ externalPort = 3000
 [userenv]
 
 [userenv.shared]
+CAL_LINK = "https://cal.com/aliviocloud/30min"
