@@ -35,6 +35,9 @@ router.get("/", async (req, res) => {
     }
   }
 
+  // Stripe / Cal / Twilio status reflect actual env presence so this endpoint
+  // accurately mirrors deployment state. They will report `configured` as
+  // soon as the downstream tasks (Stripe billing, messaging) wire credentials.
   const stripe: StatusValue = process.env["STRIPE_SECRET_KEY"]
     ? "configured"
     : "not_configured";

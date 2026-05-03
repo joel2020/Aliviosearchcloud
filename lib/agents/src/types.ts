@@ -24,7 +24,15 @@ export interface AgentDefinition<
   id: string;
   name: string;
   description: string;
-  /** "structured" → JSON-mode + outputSchema validation. "text" → free-form text in `summary`. */
+  /**
+   * Documentation hint for downstream UIs:
+   *   - "structured": output is rendered as data (cards / tables) using the
+   *     fields of `outputSchema`.
+   *   - "text": output is primarily a single prose field (typically
+   *     `summary`) and should be rendered as chat/markdown.
+   * Execution itself is identical for both modes — the agent always runs
+   * in JSON mode and the response is validated against `outputSchema`.
+   */
   mode: "structured" | "text";
   inputSchema: TInput;
   outputSchema: TOutput;
