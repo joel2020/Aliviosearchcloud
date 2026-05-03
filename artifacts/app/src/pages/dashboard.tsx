@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Bot, MessageSquare, Sparkles, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeader } from "@/components/shell/PageHeader";
+import { Section } from "@/components/shell/Section";
 
 const STATS = [
   { label: "Active agents", value: "12", icon: Bot, accent: "text-primary" },
@@ -17,22 +19,23 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-1">
-        <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
-          Workspace
-        </p>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {bizLoading ? (
+      <PageHeader
+        eyebrow="Workspace"
+        title={
+          bizLoading ? (
             <Skeleton className="h-9 w-72" />
           ) : (
             biz?.name ?? "Your workspace"
-          )}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {userLoading ? "Loading…" : `Welcome back, ${user?.fullName ?? user?.email ?? "operator"}.`}
-        </p>
-      </div>
+          )
+        }
+        description={
+          userLoading
+            ? "Loading…"
+            : `Welcome back, ${user?.fullName ?? user?.email ?? "operator"}.`
+        }
+      />
 
+      <Section title="Today at a glance">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {STATS.map(({ label, value, icon: Icon, accent }, i) => (
           <motion.div
@@ -55,6 +58,7 @@ export default function DashboardPage() {
           </motion.div>
         ))}
       </div>
+      </Section>
 
       <Card className="border-border/70 bg-card/60 backdrop-blur">
         <CardHeader>

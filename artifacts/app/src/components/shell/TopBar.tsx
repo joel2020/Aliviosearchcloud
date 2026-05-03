@@ -1,25 +1,13 @@
 import { useEffect } from "react";
-import { useUser, useClerk } from "@clerk/react";
-import { Search, Command, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserButton } from "@clerk/react";
+import { Search, Command } from "lucide-react";
+import { clerkAppearance } from "@/lib/clerkAppearance";
 
 interface TopBarProps {
   onOpenPalette: () => void;
 }
 
 export function TopBar({ onOpenPalette }: TopBarProps) {
-  const { user } = useUser();
-  const { signOut } = useClerk();
-
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -30,11 +18,6 @@ export function TopBar({ onOpenPalette }: TopBarProps) {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onOpenPalette]);
-
-  const initial =
-    user?.firstName?.[0] ||
-    user?.primaryEmailAddress?.emailAddress?.[0]?.toUpperCase() ||
-    "A";
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-border/60 bg-background/80 px-6 backdrop-blur">
@@ -51,37 +34,10 @@ export function TopBar({ onOpenPalette }: TopBarProps) {
       </button>
 
       <div className="flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hover-elevate gap-2 px-2"
-            >
-              <Avatar className="h-7 w-7">
-                {user?.imageUrl ? (
-                  <AvatarImage src={user.imageUrl} alt={user.fullName ?? ""} />
-                ) : null}
-                <AvatarFallback className="bg-primary/20 text-xs text-primary">
-                  {initial}
-                </AvatarFallback>
-              </Avatar>
-              <span className="hidden text-sm font-medium sm:inline">
-                {user?.firstName ?? user?.primaryEmailAddress?.emailAddress}
-              </span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
-              {user?.primaryEmailAddress?.emailAddress}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut()}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <UserButton
+          appearance={clerkAppearance}
+          showName
+        />
       </div>
     </header>
   );
