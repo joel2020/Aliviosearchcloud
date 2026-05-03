@@ -166,7 +166,7 @@ function MessagingSection() {
                   onClick={() =>
                     verify.mutate({ id: pendingId, data: { code } })
                   }
-                  disabled={verify.isPending || code.length < 4}
+                  disabled={verify.isPending || code.length !== 6}
                 >
                   {verify.isPending ? "Verifying…" : "Verify"}
                 </Button>

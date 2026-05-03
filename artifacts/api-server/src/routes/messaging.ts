@@ -125,9 +125,18 @@ router.post(
     const skipSig = process.env["TWILIO_SKIP_SIGNATURE_CHECK"] === "1";
     if (!skipSig) {
       const signature = req.header("X-Twilio-Signature") ?? "";
-      const proto = (req.header("x-forwarded-proto") ?? req.protocol) || "https";
-      const host = req.header("x-forwarded-host") ?? req.get("host") ?? "";
-      const url = `${proto}://${host}${req.originalUrl}`;
+      // Prefer PUBLIC_APP_URL (the URL configured in the Twilio console) so
+      // signature verification is robust to proxy/header rewriting. Fall back
+      // to reconstructing from forwarded headers when not set.
+      let url: string;
+      if (cfg.publicAppUrl) {
+        url = `${cfg.publicAppUrl.replace(/\/+$/, "")}${req.originalUrl}`;
+      } else {
+        const proto =
+          (req.header("x-forwarded-proto") ?? req.protocol) || "https";
+        const host = req.header("x-forwarded-host") ?? req.get("host") ?? "";
+        url = `${proto}://${host}${req.originalUrl}`;
+      }
       const params = (req.body ?? {}) as Record<string, string>;
       const valid = twilio.validateRequest(
         cfg.authToken,
@@ -483,7 +492,7 @@ router.post("/connections/:id/verify", requireAuth, async (req, res, next) => {
       return;
     }
     const code = body.data.code.trim();
-    if (!/^\d{4,8}$/.test(code)) {
+    if (!/^\d{6}$/.test(code)) {
       res.status(400).json({
         error: "invalid_code",
         message: "Enter the 6-digit code we sent you.",

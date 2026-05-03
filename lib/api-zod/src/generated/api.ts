@@ -600,8 +600,18 @@ export const VerifyMessagingConnectionParams = zod.object({
   id: zod.coerce.string(),
 });
 
+export const verifyMessagingConnectionBodyCodeMin = 6;
+export const verifyMessagingConnectionBodyCodeMax = 6;
+
+export const verifyMessagingConnectionBodyCodeRegExp = new RegExp("^[0-9]{6}$");
+
 export const VerifyMessagingConnectionBody = zod.object({
-  code: zod.string().describe("6-digit numeric verification code"),
+  code: zod
+    .string()
+    .min(verifyMessagingConnectionBodyCodeMin)
+    .max(verifyMessagingConnectionBodyCodeMax)
+    .regex(verifyMessagingConnectionBodyCodeRegExp)
+    .describe("6-digit numeric verification code"),
 });
 
 export const VerifyMessagingConnectionResponse = zod.object({

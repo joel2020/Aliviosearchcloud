@@ -1220,4 +1220,7 @@ components:
         code:
           type: string
           description: 6-digit numeric verification code
+          pattern: "^[0-9]{6}$"
+          minLength: 6
+          maxLength: 6
       required: [code]

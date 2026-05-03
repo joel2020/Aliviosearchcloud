@@ -7,6 +7,11 @@
  */
 
 export interface VerifyMessagingConnectionInput {
-  /** 6-digit numeric verification code */
+  /**
+   * 6-digit numeric verification code
+   * @minLength 6
+   * @maxLength 6
+   * @pattern ^[0-9]{6}$
+   */
   code: string;
 }
