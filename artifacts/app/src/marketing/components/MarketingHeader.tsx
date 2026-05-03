@@ -1,9 +1,8 @@
 import { Link } from "wouter";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
-import { basePath } from "@/lib/clerkAppearance";
 
 export function MarketingHeader() {
   const [isScrolled, setIsScrolled] = useState(false);

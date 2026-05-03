@@ -8,7 +8,7 @@ import { CTA_AUDIT } from "@/marketing/lib/ctas";
 
 export default function Agents() {
   useSeo({
-    title: "AI Agents | Alivio Search Cloud",
+    title: "AI Agents",
     description: "Meet your new 12-agent revenue workforce. Specialized AI for capturing leads, converting opportunities, and scaling outbound.",
     path: "/agents",
   });

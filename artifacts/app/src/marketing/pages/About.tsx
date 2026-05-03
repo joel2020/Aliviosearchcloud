@@ -6,7 +6,7 @@ import { CTA_AUDIT } from "@/marketing/lib/ctas";
 
 export default function About() {
   useSeo({
-    title: "About Us | Alivio Search Cloud",
+    title: "About Us",
     description: "We install AI systems that capture, convert, and scale revenue for small businesses.",
     path: "/about",
   });

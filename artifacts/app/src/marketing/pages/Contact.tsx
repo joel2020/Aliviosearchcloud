@@ -10,7 +10,7 @@ import { useState } from "react";
 
 export default function Contact() {
   useSeo({
-    title: "Contact Us | Alivio Search Cloud",
+    title: "Contact Us",
     description: "Get in touch with the Alivio team to discuss your AI Revenue Engine.",
     path: "/contact",
   });

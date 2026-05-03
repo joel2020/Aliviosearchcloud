@@ -7,7 +7,7 @@ import { CTA_INSTALL, CTA_BOOK_CALL } from "@/marketing/lib/ctas";
 
 export default function Pricing() {
   useSeo({
-    title: "Pricing | Alivio Search Cloud",
+    title: "Pricing",
     description: "Simple, transparent pricing for your AI Revenue Engine. Stop losing leads and start scaling pipeline today.",
     path: "/pricing",
   });

@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { useSeo } from "@/marketing/lib/useSeo";
 import { CTA_AUDIT, CTA_BOOK_CALL, CTA_INSTALL, CTA_ASSISTANT } from "@/marketing/lib/ctas";
 import { MARKETING_AGENTS } from "@/marketing/lib/agents";
-import { MARKETING_BLOG_POSTS } from "@/marketing/lib/blogPosts";
+import { MARKETING_BLOG_POSTS, latestPosts } from "@/marketing/lib/blogPosts";
 import { Input } from "@/components/ui/input";
 
 export default function Home() {
   useSeo({
-    title: "Alivio Search Cloud | AI Revenue Engine",
+    title: "AI Revenue Engine",
     description: "Alivio helps small businesses recover missed revenue, follow up with every lead, and scale pipeline with AI agents that never sleep.",
     path: "/",
   });
@@ -264,7 +264,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-8">
-              {MARKETING_BLOG_POSTS.slice(0, 3).map((post) => (
+              {latestPosts(3).map((post) => (
                 <div key={post.slug} className="group rounded-2xl border border-border bg-background overflow-hidden cursor-pointer hover:border-primary/50 transition-colors">
                   <div className="aspect-[16/9] bg-muted/50 w-full"></div>
                   <div className="p-6">
