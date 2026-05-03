@@ -22,8 +22,22 @@ pnpm monorepo with three runtime artifacts:
   `CTA_BOOK_CALL`, `CTA_INSTALL`, `CTA_ASSISTANT`) so downstream tasks flip
   hrefs in one place. SEO: per-route title/description/canonical/OG via
   `src/marketing/lib/useSeo.ts`; static fallback meta + JSON-LD
-  (`Organization` + `WebSite`) in `index.html`; `public/sitemap.xml` and
-  `public/robots.txt` listing all 5 marketing routes.
+  (`Organization` + `WebSite`) in `index.html`. **Blog**: routes
+  `/blog` (index with category chips + search + audit CTAs top/bottom)
+  and `/blog/:slug` (article template with H1/byline/reading time,
+  Tailwind Typography body, related-posts strip, footer CTA, JSON-LD
+  `BlogPosting`). Authoring is markdown files under
+  `artifacts/app/content/blog/*.md` with Zod-validated frontmatter
+  (`title`, `slug`, `description`, `category`, `publishedAt`, `tags`,
+  `ogImage`, optional `author`); the loader in
+  `src/marketing/blog/loader.ts` uses `import.meta.glob` to pull every
+  post at build time and computes reading time + excerpt.
+  `vite.blog-feeds.ts` is a Vite plugin that re-reads the same content
+  dir on the Node side and (a) serves `/blog/rss.xml` and `/sitemap.xml`
+  via dev/preview middleware and (b) writes the generated XML into
+  `dist/public/` at `closeBundle` so the published feed and sitemap
+  always include every post. The homepage blog preview block pulls the
+  latest 3 from the loader via `src/marketing/lib/blogPosts.ts`.
 - `artifacts/api-server` — Express 5 API mounted at `/api`. Uses `@clerk/express`
   for auth, Drizzle ORM for Postgres, Azure OpenAI via `@workspace/azure-openai`.
 - `artifacts/mockup-sandbox` — Component preview server for canvas mockups.

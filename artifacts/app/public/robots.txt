@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://www.aliviosearch.cloud/sitemap.xml
+# RSS feed for the blog:
+# https://www.aliviosearch.cloud/blog/rss.xml

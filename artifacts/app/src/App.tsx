@@ -35,6 +35,8 @@ import MarketingPricing from "@/marketing/pages/Pricing";
 import MarketingAgents from "@/marketing/pages/Agents";
 import MarketingAbout from "@/marketing/pages/About";
 import MarketingContact from "@/marketing/pages/Contact";
+import MarketingBlog from "@/marketing/pages/Blog";
+import MarketingBlogPost from "@/marketing/pages/BlogPost";
 
 const clerkPubKey = publishableKeyFromHost(
   typeof window !== "undefined" ? window.location.hostname : "",
@@ -198,6 +200,10 @@ function ClerkProviderWithRoutes() {
             <Route path="/pricing" component={MarketingPricing} />
             <Route path="/about" component={MarketingAbout} />
             <Route path="/contact" component={MarketingContact} />
+            <Route path="/blog" component={MarketingBlog} />
+            <Route path="/blog/:slug">
+              {(params) => <MarketingBlogPost params={params} />}
+            </Route>
             {/* Placeholder routes for CTAs wired by downstream tasks
                 (Stripe payment links + Cal.com booking). They render
                 the pricing page so visitors land somewhere intentional

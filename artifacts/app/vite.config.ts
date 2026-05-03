@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { blogFeedsPlugin } from "./vite.blog-feeds";
 
 const rawPort = process.env.PORT;
 
@@ -47,6 +48,14 @@ export default defineConfig({
     react(),
     tailwindcss({ optimize: false }),
     runtimeErrorOverlay(),
+    blogFeedsPlugin({
+      contentDir: path.resolve(import.meta.dirname, "content/blog"),
+      siteUrl:
+        process.env.PUBLIC_APP_URL?.replace(/\/$/, "") ||
+        "https://www.aliviosearch.cloud",
+      outDir: path.resolve(import.meta.dirname, "dist/public"),
+      basePath: process.env.BASE_PATH ?? "/",
+    }),
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [

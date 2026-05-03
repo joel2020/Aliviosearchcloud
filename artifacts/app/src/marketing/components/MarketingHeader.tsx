@@ -45,6 +45,7 @@ export function MarketingHeader() {
     { label: "Home", href: "/" },
     { label: "Agents", href: "/agents" },
     { label: "Pricing", href: "/pricing" },
+    { label: "Blog", href: "/blog" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];

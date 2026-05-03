@@ -259,8 +259,9 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">Insights from the Revenue Engine</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Practical playbooks on revenue recovery, lead follow-up, and AI operations for small business.</p>
           </div>
-          
+
           {(!MARKETING_BLOG_POSTS || MARKETING_BLOG_POSTS.length === 0) ? (
             <div className="max-w-xl mx-auto text-center rounded-2xl border border-border bg-background p-10">
               <Mail className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
@@ -272,18 +273,34 @@ export default function Home() {
               </form>
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-8">
-              {latestPosts(3).map((post) => (
-                <div key={post.slug} className="group rounded-2xl border border-border bg-background overflow-hidden cursor-pointer hover:border-primary/50 transition-colors">
-                  <div className="aspect-[16/9] bg-muted/50 w-full"></div>
-                  <div className="p-6">
-                    <p className="text-xs text-muted-foreground mb-2">{post.publishedAt}</p>
-                    <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-3">{post.excerpt}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="grid md:grid-cols-3 gap-8">
+                {latestPosts(3).map((post) => (
+                  <Link
+                    key={post.slug}
+                    href={`/blog/${post.slug}`}
+                    className="group rounded-2xl border border-border bg-background overflow-hidden hover:border-primary/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    data-testid={`home-blog-card-${post.slug}`}
+                  >
+                    <div className="p-6">
+                      <p className="text-xs text-primary font-medium uppercase tracking-wider mb-3">{post.category}</p>
+                      <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">{post.title}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{post.excerpt}</p>
+                      <p className="text-xs text-muted-foreground">{post.publishedAt} · {post.readingMinutes} min read</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div className="text-center mt-12">
+                <Link
+                  href="/blog"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                  data-testid="home-blog-all-link"
+                >
+                  See all articles <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </section>

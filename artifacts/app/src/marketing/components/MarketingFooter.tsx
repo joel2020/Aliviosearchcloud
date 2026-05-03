@@ -37,6 +37,7 @@ export function MarketingFooter() {
             <h4 className="font-semibold text-foreground mb-4">Company</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link href="/about" className="hover:text-foreground transition-colors">About</Link></li>
+              <li><Link href="/blog" className="hover:text-foreground transition-colors">Blog</Link></li>
               <li><Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
             </ul>
           </div>
