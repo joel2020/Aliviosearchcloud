@@ -26,8 +26,23 @@ if (!basePath) {
   );
 }
 
+const clerkPublishableKey =
+  process.env.VITE_CLERK_PUBLISHABLE_KEY ??
+  process.env.CLERK_PUBLISHABLE_KEY ??
+  "";
+
+if (!clerkPublishableKey) {
+  throw new Error(
+    "CLERK_PUBLISHABLE_KEY (or VITE_CLERK_PUBLISHABLE_KEY) must be set in Replit Secrets.",
+  );
+}
+
 export default defineConfig({
   base: basePath,
+  define: {
+    "import.meta.env.VITE_CLERK_PUBLISHABLE_KEY":
+      JSON.stringify(clerkPublishableKey),
+  },
   plugins: [
     react(),
     tailwindcss({ optimize: false }),
