@@ -1,7 +1,5 @@
 import { MarketingLayout } from "../components/MarketingLayout";
-import { Link } from "wouter";
 import { Bot, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useSeo } from "@/marketing/lib/useSeo";
 import { MARKETING_AGENTS } from "@/marketing/lib/agents";
 import { CTAButton } from "@/components/CTAButton";

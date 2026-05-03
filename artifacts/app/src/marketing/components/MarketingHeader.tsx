@@ -1,6 +1,5 @@
 import { Link } from "wouter";
 import { Moon, Sun, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CTAButton } from "@/components/CTAButton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";

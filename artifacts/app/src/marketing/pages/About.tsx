@@ -1,6 +1,4 @@
 import { MarketingLayout } from "../components/MarketingLayout";
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
 import { useSeo } from "@/marketing/lib/useSeo";
 import { CTAButton } from "@/components/CTAButton";
 
