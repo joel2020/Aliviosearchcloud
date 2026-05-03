@@ -22,6 +22,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import DashboardPage from "@/pages/dashboard";
 import AgentsPage from "@/pages/agents";
+import AgentDetailPage from "@/pages/agent-detail";
+import AgentRunDetailPage from "@/pages/agent-run-detail";
 import AssistantPage from "@/pages/assistant";
 import SearchPage from "@/pages/search";
 import SettingsPage from "@/pages/settings";
@@ -179,6 +181,20 @@ function ClerkProviderWithRoutes() {
               <ProtectedShell><DashboardPage /></ProtectedShell>
             </Route>
             <Route path="/agents" component={AgentsRoute} />
+            <Route path="/agents/:id/runs/:runId">
+              {(params) => (
+                <ProtectedShell>
+                  <AgentRunDetailPage params={params} />
+                </ProtectedShell>
+              )}
+            </Route>
+            <Route path="/agents/:id">
+              {(params) => (
+                <ProtectedShell>
+                  <AgentDetailPage params={params} />
+                </ProtectedShell>
+              )}
+            </Route>
             <Route path="/pricing" component={MarketingPricing} />
             <Route path="/about" component={MarketingAbout} />
             <Route path="/contact" component={MarketingContact} />

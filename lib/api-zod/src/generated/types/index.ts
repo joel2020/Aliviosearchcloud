@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./agentDetail";
+export * from "./agentDetailMode";
+export * from "./agentInputField";
+export * from "./agentInputFieldType";
 export * from "./agentRun";
 export * from "./agentRunInput";
 export * from "./agentRunOutput";
@@ -13,11 +17,20 @@ export * from "./agentSummary";
 export * from "./agentSummaryMode";
 export * from "./business";
 export * from "./currentUser";
+export * from "./dashboardKpis";
+export * from "./dashboardSuggestion";
+export * from "./dashboardSummary";
 export * from "./errorResponse";
 export * from "./healthStatus";
 export * from "./listAgentRunsParams";
 export * from "./runAgentRequest";
 export * from "./runAgentRequestInput";
+export * from "./searchAgentHit";
+export * from "./searchConversationHit";
+export * from "./searchResults";
+export * from "./searchRunHit";
+export * from "./searchSettingHit";
+export * from "./searchWorkspaceParams";
 export * from "./serviceStatus";
 export * from "./serviceStatusMessaging";
 export * from "./serviceStatusValue";

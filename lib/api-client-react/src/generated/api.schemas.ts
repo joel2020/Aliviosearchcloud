@@ -70,10 +70,61 @@ export interface AgentSummary {
   mode: AgentSummaryMode;
 }
 
-export type RunAgentRequestInput = { [key: string]: unknown };
+export type AgentInputFieldType =
+  (typeof AgentInputFieldType)[keyof typeof AgentInputFieldType];
 
-export interface RunAgentRequest {
-  input: RunAgentRequestInput;
+export const AgentInputFieldType = {
+  string: "string",
+  textarea: "textarea",
+  number: "number",
+  integer: "integer",
+  enum: "enum",
+  "string-array": "string-array",
+} as const;
+
+export interface AgentInputField {
+  name: string;
+  label: string;
+  type: AgentInputFieldType;
+  required: boolean;
+  description?: string | null;
+  placeholder?: string | null;
+  options?: string[] | null;
+  defaultValue?: string | number | string[] | null;
+  min?: number | null;
+  max?: number | null;
+  step?: number | null;
+}
+
+export type AgentDetailMode =
+  (typeof AgentDetailMode)[keyof typeof AgentDetailMode];
+
+export const AgentDetailMode = {
+  structured: "structured",
+  text: "text",
+} as const;
+
+export interface AgentDetail {
+  id: string;
+  name: string;
+  description: string;
+  mode: AgentDetailMode;
+  promptVersion: string;
+  fields: AgentInputField[];
+}
+
+export interface DashboardKpis {
+  runsThisWeek: number;
+  runsTotal: number;
+  activeAgents: number;
+  revenueLeaksIdentified: number;
+}
+
+export interface DashboardSuggestion {
+  text: string;
+  agentSlug?: string | null;
+  runId?: string | null;
+  source: string;
 }
 
 export type AgentRunInput = { [key: string]: unknown } | null;
@@ -92,6 +143,55 @@ export interface AgentRun {
   tokensUsed?: number | null;
   startedAt: string;
   completedAt?: string | null;
+}
+
+export interface DashboardSummary {
+  business: Business;
+  kpis: DashboardKpis;
+  recentRuns: AgentRun[];
+  suggestedActions: DashboardSuggestion[];
+}
+
+export interface SearchAgentHit {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface SearchRunHit {
+  id: string;
+  agentSlug: string;
+  agentName: string;
+  status: string;
+  preview: string;
+  startedAt: string;
+}
+
+export interface SearchConversationHit {
+  id: string;
+  title: string;
+  channel: string;
+  updatedAt: string;
+}
+
+export interface SearchSettingHit {
+  label: string;
+  href: string;
+  description: string;
+}
+
+export interface SearchResults {
+  query: string;
+  agents: SearchAgentHit[];
+  runs: SearchRunHit[];
+  conversations: SearchConversationHit[];
+  settings: SearchSettingHit[];
+}
+
+export type RunAgentRequestInput = { [key: string]: unknown };
+
+export interface RunAgentRequest {
+  input: RunAgentRequestInput;
 }
 
 export type ServiceStatusValue =
@@ -143,6 +243,14 @@ export interface SmokeTestReport {
   notConfigured: number;
   results: SmokeTestResult[];
 }
+
+export type SearchWorkspaceParams = {
+  /**
+   * @minLength 1
+   * @maxLength 200
+   */
+  q: string;
+};
 
 export type ListAgentRunsParams = {
   /**

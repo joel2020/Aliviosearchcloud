@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface PageHeaderProps {
-  eyebrow?: string;
+  eyebrow?: ReactNode;
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
@@ -25,9 +25,9 @@ export function PageHeader({
     >
       <div className="space-y-1">
         {eyebrow ? (
-          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
             {eyebrow}
-          </p>
+          </div>
         ) : null}
         <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
         {description ? (

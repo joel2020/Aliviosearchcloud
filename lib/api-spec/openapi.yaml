@@ -22,6 +22,10 @@ tags:
     description: Service status
   - name: admin
     description: Admin-only endpoints
+  - name: dashboard
+    description: Customer dashboard summary
+  - name: search
+    description: Cross-workspace search
 paths:
   /healthz:
     get:
@@ -121,6 +125,92 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AgentSummary"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /agents/{id}:
+    get:
+      operationId: getAgent
+      tags: [agents]
+      summary: Get agent metadata including dynamic form fields
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Agent detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentDetail"
+        "400":
+          description: Invalid params
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Customer dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /search:
+    get:
+      operationId: searchWorkspace
+      tags: [search]
+      summary: Search agents, runs, conversations, and settings
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResults"
+        "400":
+          description: Invalid query
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "401":
           description: Unauthorized
           content:
@@ -358,6 +448,180 @@ components:
           type: string
           enum: [structured, text]
       required: [id, name, description, mode]
+    AgentInputField:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum: [string, textarea, number, integer, enum, string-array]
+        required:
+          type: boolean
+        description:
+          type: string
+          nullable: true
+        placeholder:
+          type: string
+          nullable: true
+        options:
+          type: array
+          items:
+            type: string
+          nullable: true
+        defaultValue:
+          nullable: true
+          oneOf:
+            - type: string
+            - type: number
+            - type: array
+              items:
+                type: string
+        min:
+          type: number
+          nullable: true
+        max:
+          type: number
+          nullable: true
+        step:
+          type: number
+          nullable: true
+      required: [name, label, type, required]
+    AgentDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        mode:
+          type: string
+          enum: [structured, text]
+        promptVersion:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentInputField"
+      required: [id, name, description, mode, promptVersion, fields]
+    DashboardKpis:
+      type: object
+      properties:
+        runsThisWeek:
+          type: integer
+        runsTotal:
+          type: integer
+        activeAgents:
+          type: integer
+        revenueLeaksIdentified:
+          type: integer
+      required: [runsThisWeek, runsTotal, activeAgents, revenueLeaksIdentified]
+    DashboardSuggestion:
+      type: object
+      properties:
+        text:
+          type: string
+        agentSlug:
+          type: string
+          nullable: true
+        runId:
+          type: string
+          nullable: true
+        source:
+          type: string
+      required: [text, source]
+    DashboardSummary:
+      type: object
+      properties:
+        business:
+          $ref: "#/components/schemas/Business"
+        kpis:
+          $ref: "#/components/schemas/DashboardKpis"
+        recentRuns:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentRun"
+        suggestedActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardSuggestion"
+      required: [business, kpis, recentRuns, suggestedActions]
+    SearchAgentHit:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+      required: [id, name, description]
+    SearchRunHit:
+      type: object
+      properties:
+        id:
+          type: string
+        agentSlug:
+          type: string
+        agentName:
+          type: string
+        status:
+          type: string
+        preview:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+      required: [id, agentSlug, agentName, status, preview, startedAt]
+    SearchConversationHit:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        channel:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, title, channel, updatedAt]
+    SearchSettingHit:
+      type: object
+      properties:
+        label:
+          type: string
+        href:
+          type: string
+        description:
+          type: string
+      required: [label, href, description]
+    SearchResults:
+      type: object
+      properties:
+        query:
+          type: string
+        agents:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchAgentHit"
+        runs:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchRunHit"
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchConversationHit"
+        settings:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchSettingHit"
+      required: [query, agents, runs, conversations, settings]
     RunAgentRequest:
       type: object
       properties:

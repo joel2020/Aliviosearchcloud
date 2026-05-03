@@ -1,76 +1,100 @@
+import { useMemo } from "react";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
-  Bot,
-  Megaphone,
-  Headphones,
-  PenTool,
-  Mail,
-  Phone,
-  TrendingUp,
-  Search,
-  Calendar,
-  ListChecks,
-  ShieldCheck,
-  Wallet,
-} from "lucide-react";
+  useListAgents,
+  useListAgentRuns,
+} from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-const AGENTS = [
-  { slug: "marketing-strategist", name: "Marketing Strategist", icon: Megaphone, blurb: "Plans launches and campaigns end-to-end." },
-  { slug: "content-writer", name: "Content Writer", icon: PenTool, blurb: "Long-form posts, briefs, and SEO drafts." },
-  { slug: "customer-support", name: "Customer Support", icon: Headphones, blurb: "First-line replies on every channel." },
-  { slug: "email-outreach", name: "Email Outreach", icon: Mail, blurb: "Cold sequences with personalization." },
-  { slug: "sms-concierge", name: "SMS Concierge", icon: Phone, blurb: "Two-way SMS for bookings and reminders." },
-  { slug: "sales-coach", name: "Sales Coach", icon: TrendingUp, blurb: "Reviews calls and recommends next steps." },
-  { slug: "seo-auditor", name: "SEO Auditor", icon: Search, blurb: "On-page audit + keyword expansion." },
-  { slug: "scheduler", name: "Scheduler", icon: Calendar, blurb: "Books meetings across teams and zones." },
-  { slug: "ops-checklist", name: "Ops Checklist", icon: ListChecks, blurb: "Daily and weekly operating rhythms." },
-  { slug: "compliance-watch", name: "Compliance Watch", icon: ShieldCheck, blurb: "Reviews docs against your policies." },
-  { slug: "billing-bot", name: "Billing Bot", icon: Wallet, blurb: "Drafts invoices and chases collections." },
-  { slug: "research-assistant", name: "Research Assistant", icon: Bot, blurb: "Briefs on competitors and markets." },
-];
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeader } from "@/components/shell/PageHeader";
+import { agentMeta, formatRelative } from "@/lib/agentMeta";
 
 export default function AgentsPage() {
-  return (
-    <div className="space-y-8">
-      <div className="space-y-1">
-        <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
-          AI workforce
-        </p>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Your 12 production agents
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          All agents run on your Azure OpenAI deployment. Deeper wiring lands in the next release.
-        </p>
-      </div>
+  const { data: agents, isLoading } = useListAgents();
+  const { data: runs } = useListAgentRuns({ limit: 50 });
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {AGENTS.map(({ slug, name, icon: Icon, blurb }, i) => (
-          <motion.div
-            key={slug}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.025 }}
-          >
-            <Card className="group h-full border-border/70 bg-card/60 backdrop-blur hover-elevate cursor-pointer">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/15 text-primary">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
-                  Beta
-                </Badge>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <CardTitle className="text-base">{name}</CardTitle>
-                <p className="text-sm text-muted-foreground">{blurb}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+  const lastBySlug = useMemo(() => {
+    const m = new Map<string, { id: string; startedAt: string; status: string }>();
+    for (const r of runs ?? []) {
+      if (!m.has(r.agentSlug)) {
+        m.set(r.agentSlug, {
+          id: r.id,
+          startedAt: r.startedAt,
+          status: r.status,
+        });
+      }
+    }
+    return m;
+  }, [runs]);
+
+  return (
+    <div className="space-y-8" data-testid="page-agents">
+      <PageHeader
+        eyebrow="AI workforce"
+        title="Your 12 production agents"
+        description="All agents run on your Azure OpenAI deployment. Pick one to configure and run."
+      />
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {(agents ?? []).map((agent, i) => {
+            const meta = agentMeta(agent.id);
+            const last = lastBySlug.get(agent.id);
+            return (
+              <motion.div
+                key={agent.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.025 }}
+              >
+                <Link href={`/agents/${agent.id}`} data-testid={`agent-card-${agent.id}`}>
+                  <Card className="group flex h-full cursor-pointer flex-col border-border/70 bg-card/60 backdrop-blur hover-elevate">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                      <div className={`grid h-10 w-10 place-items-center rounded-lg bg-primary/10 ${meta.accent}`}>
+                        <meta.icon className="h-5 w-5" />
+                      </div>
+                      <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
+                        {agent.mode}
+                      </Badge>
+                    </CardHeader>
+                    <CardContent className="flex flex-1 flex-col justify-between gap-3">
+                      <div className="space-y-2">
+                        <CardTitle className="text-base">{agent.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {agent.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between gap-2 pt-2 text-xs text-muted-foreground">
+                        <span>
+                          {last
+                            ? `Last run ${formatRelative(last.startedAt)}`
+                            : "Never run"}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="pointer-events-none opacity-90 group-hover:opacity-100"
+                        >
+                          Open
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

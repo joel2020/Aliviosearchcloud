@@ -3,3 +3,9 @@ export * from "./registry";
 export * from "./runner";
 export { defineAgent, businessContextBlock } from "./defineAgent";
 export { ALL_AGENTS } from "./agents/index";
+export {
+  getAgentFormFields,
+  allAgentFormFields,
+  type FormField,
+  type FormFieldType,
+} from "./formFields";

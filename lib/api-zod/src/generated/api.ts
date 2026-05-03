@@ -118,6 +118,138 @@ export const ListAgentsResponseItem = zod.object({
 export const ListAgentsResponse = zod.array(ListAgentsResponseItem);
 
 /**
+ * @summary Get agent metadata including dynamic form fields
+ */
+export const GetAgentParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const GetAgentResponse = zod.object({
+  id: zod.string(),
+  name: zod.string(),
+  description: zod.string(),
+  mode: zod.enum(["structured", "text"]),
+  promptVersion: zod.string(),
+  fields: zod.array(
+    zod.object({
+      name: zod.string(),
+      label: zod.string(),
+      type: zod.enum([
+        "string",
+        "textarea",
+        "number",
+        "integer",
+        "enum",
+        "string-array",
+      ]),
+      required: zod.boolean(),
+      description: zod.string().nullish(),
+      placeholder: zod.string().nullish(),
+      options: zod.array(zod.string()).nullish(),
+      defaultValue: zod
+        .union([zod.string(), zod.number(), zod.array(zod.string())])
+        .nullish(),
+      min: zod.number().nullish(),
+      max: zod.number().nullish(),
+      step: zod.number().nullish(),
+    }),
+  ),
+});
+
+/**
+ * @summary Customer dashboard summary
+ */
+export const GetDashboardSummaryResponse = zod.object({
+  business: zod.object({
+    id: zod.string(),
+    ownerId: zod.string(),
+    name: zod.string(),
+    slug: zod.string(),
+    industry: zod.string().nullish(),
+    websiteUrl: zod.string().nullish(),
+    description: zod.string().nullish(),
+    brandColor: zod.string().nullish(),
+    logoUrl: zod.string().nullish(),
+    createdAt: zod.coerce.date(),
+    updatedAt: zod.coerce.date(),
+  }),
+  kpis: zod.object({
+    runsThisWeek: zod.number(),
+    runsTotal: zod.number(),
+    activeAgents: zod.number(),
+    revenueLeaksIdentified: zod.number(),
+  }),
+  recentRuns: zod.array(
+    zod.object({
+      id: zod.string(),
+      businessId: zod.string(),
+      userId: zod.string(),
+      agentSlug: zod.string(),
+      status: zod.string(),
+      input: zod.record(zod.string(), zod.unknown()).nullish(),
+      output: zod.record(zod.string(), zod.unknown()).nullish(),
+      errorMessage: zod.string().nullish(),
+      tokensUsed: zod.number().nullish(),
+      startedAt: zod.coerce.date(),
+      completedAt: zod.coerce.date().nullish(),
+    }),
+  ),
+  suggestedActions: zod.array(
+    zod.object({
+      text: zod.string(),
+      agentSlug: zod.string().nullish(),
+      runId: zod.string().nullish(),
+      source: zod.string(),
+    }),
+  ),
+});
+
+/**
+ * @summary Search agents, runs, conversations, and settings
+ */
+export const searchWorkspaceQueryQMax = 200;
+
+export const SearchWorkspaceQueryParams = zod.object({
+  q: zod.coerce.string().min(1).max(searchWorkspaceQueryQMax),
+});
+
+export const SearchWorkspaceResponse = zod.object({
+  query: zod.string(),
+  agents: zod.array(
+    zod.object({
+      id: zod.string(),
+      name: zod.string(),
+      description: zod.string(),
+    }),
+  ),
+  runs: zod.array(
+    zod.object({
+      id: zod.string(),
+      agentSlug: zod.string(),
+      agentName: zod.string(),
+      status: zod.string(),
+      preview: zod.string(),
+      startedAt: zod.coerce.date(),
+    }),
+  ),
+  conversations: zod.array(
+    zod.object({
+      id: zod.string(),
+      title: zod.string(),
+      channel: zod.string(),
+      updatedAt: zod.coerce.date(),
+    }),
+  ),
+  settings: zod.array(
+    zod.object({
+      label: zod.string(),
+      href: zod.string(),
+      description: zod.string(),
+    }),
+  ),
+});
+
+/**
  * @summary Run an agent
  */
 export const RunAgentParams = zod.object({

@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
-import { agentRegistry } from "@workspace/agents";
-import { RunAgentParams, RunAgentBody } from "@workspace/api-zod";
+import { agentRegistry, getAgentFormFields } from "@workspace/agents";
+import { RunAgentParams, RunAgentBody, GetAgentParams } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
 import { ensureUser, ensureBusiness } from "../lib/ensure";
 import { serializeAgentRun } from "../lib/agentRunStore";
@@ -10,6 +10,33 @@ const router: IRouter = Router();
 
 router.get("/", requireAuth, (_req, res) => {
   res.json(agentRegistry.summaries());
+});
+
+router.get("/:id", requireAuth, (req, res) => {
+  const params = GetAgentParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({
+      error: "invalid_params",
+      message: params.error.issues.map((i) => i.message).join(", "),
+    });
+    return;
+  }
+  const agent = agentRegistry.get(params.data.id);
+  if (!agent) {
+    res.status(404).json({
+      error: "agent_not_found",
+      message: `Unknown agent id: ${params.data.id}`,
+    });
+    return;
+  }
+  res.json({
+    id: agent.id,
+    name: agent.name,
+    description: agent.description,
+    mode: agent.mode,
+    promptVersion: agent.promptVersion,
+    fields: getAgentFormFields(agent.id),
+  });
 });
 
 router.post("/:id/run", requireAuth, async (req, res, next) => {

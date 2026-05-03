@@ -17,14 +17,18 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AgentDetail,
   AgentRun,
   AgentSummary,
   Business,
   CurrentUser,
+  DashboardSummary,
   ErrorResponse,
   HealthStatus,
   ListAgentRunsParams,
   RunAgentRequest,
+  SearchResults,
+  SearchWorkspaceParams,
   ServiceStatus,
   SmokeTestReport,
   UpdateBusinessBody,
@@ -485,6 +489,260 @@ export function useListAgents<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getListAgentsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get agent metadata including dynamic form fields
+ */
+export const getGetAgentUrl = (id: string) => {
+  return `/api/agents/${id}`;
+};
+
+export const getAgent = async (
+  id: string,
+  options?: RequestInit,
+): Promise<AgentDetail> => {
+  return customFetch<AgentDetail>(getGetAgentUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetAgentQueryKey = (id: string) => {
+  return [`/api/agents/${id}`] as const;
+};
+
+export const getGetAgentQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAgent>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getAgent>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAgentQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAgent>>> = ({
+    signal,
+  }) => getAgent(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getAgent>>, TError, TData> & {
+    queryKey: QueryKey;
+  };
+};
+
+export type GetAgentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAgent>>
+>;
+export type GetAgentQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get agent metadata including dynamic form fields
+ */
+
+export function useGetAgent<
+  TData = Awaited<ReturnType<typeof getAgent>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getAgent>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetAgentQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Customer dashboard summary
+ */
+export const getGetDashboardSummaryUrl = () => {
+  return `/api/dashboard/summary`;
+};
+
+export const getDashboardSummary = async (
+  options?: RequestInit,
+): Promise<DashboardSummary> => {
+  return customFetch<DashboardSummary>(getGetDashboardSummaryUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetDashboardSummaryQueryKey = () => {
+  return [`/api/dashboard/summary`] as const;
+};
+
+export const getGetDashboardSummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDashboardSummary>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getDashboardSummary>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetDashboardSummaryQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getDashboardSummary>>
+  > = ({ signal }) => getDashboardSummary({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getDashboardSummary>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetDashboardSummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDashboardSummary>>
+>;
+export type GetDashboardSummaryQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Customer dashboard summary
+ */
+
+export function useGetDashboardSummary<
+  TData = Awaited<ReturnType<typeof getDashboardSummary>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getDashboardSummary>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetDashboardSummaryQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Search agents, runs, conversations, and settings
+ */
+export const getSearchWorkspaceUrl = (params: SearchWorkspaceParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/search?${stringifiedParams}`
+    : `/api/search`;
+};
+
+export const searchWorkspace = async (
+  params: SearchWorkspaceParams,
+  options?: RequestInit,
+): Promise<SearchResults> => {
+  return customFetch<SearchResults>(getSearchWorkspaceUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getSearchWorkspaceQueryKey = (params?: SearchWorkspaceParams) => {
+  return [`/api/search`, ...(params ? [params] : [])] as const;
+};
+
+export const getSearchWorkspaceQueryOptions = <
+  TData = Awaited<ReturnType<typeof searchWorkspace>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  params: SearchWorkspaceParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof searchWorkspace>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getSearchWorkspaceQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof searchWorkspace>>> = ({
+    signal,
+  }) => searchWorkspace(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof searchWorkspace>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type SearchWorkspaceQueryResult = NonNullable<
+  Awaited<ReturnType<typeof searchWorkspace>>
+>;
+export type SearchWorkspaceQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Search agents, runs, conversations, and settings
+ */
+
+export function useSearchWorkspace<
+  TData = Awaited<ReturnType<typeof searchWorkspace>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  params: SearchWorkspaceParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof searchWorkspace>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getSearchWorkspaceQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
