@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "KWYiKCqfjG3XDtuwDX4eb"
@@ -48,3 +47,9 @@ id = "3mO4RvYhyMy9am_a9M20g"
 uri = "file://artifacts/app/public/blog/why-small-businesses-lose-leads.png"
 type = "image"
 title = "generated_image"
+
+[[outputs]]
+id = "JaI-4atosGS4FCgHecl3N"
+uri = "file://.local/geo-audit-alivio.md"
+type = "text"
+title = "GEO Audit — Alivio Search Cloud"
