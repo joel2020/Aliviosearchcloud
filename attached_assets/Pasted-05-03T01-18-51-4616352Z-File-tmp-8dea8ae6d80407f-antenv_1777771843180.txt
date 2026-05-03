@@ -1,0 +1,88 @@
+05-03T01:18:51.4616352Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/mongo_client.py", line 1246, in _checkout
+2026-05-03T01:18:51.4616378Z     with server.checkout(handler=err_handler) as conn:
+2026-05-03T01:18:51.4616404Z   File "/opt/python/3.11.14/lib/python3.11/contextlib.py", line 137, in __enter__
+2026-05-03T01:18:51.4616427Z     return next(self.gen)
+2026-05-03T01:18:51.461645Z            ^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616478Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 1598, in checkout
+2026-05-03T01:18:51.4616502Z     conn = self._get_conn(handler=handler)
+2026-05-03T01:18:51.4616527Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616572Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 1714, in _get_conn
+2026-05-03T01:18:51.4616598Z     conn = self.connect(handler=handler)
+2026-05-03T01:18:51.4616622Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616649Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 1568, in connect
+2026-05-03T01:18:51.4616673Z     conn.authenticate()
+2026-05-03T01:18:51.46167Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 1042, in authenticate
+2026-05-03T01:18:51.4616726Z     auth.authenticate(creds, self, reauthenticate=reauthenticate)
+2026-05-03T01:18:51.4616753Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/auth.py", line 616, in authenticate
+2026-05-03T01:18:51.4616777Z     auth_func(credentials, conn)
+2026-05-03T01:18:51.4616804Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/auth.py", line 289, in _authenticate_scram
+2026-05-03T01:18:51.4616849Z     res = conn.command(source, cmd)
+2026-05-03T01:18:51.4616874Z           ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616901Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/helpers.py", line 315, in inner
+2026-05-03T01:18:51.4616925Z     return func(*args, **kwargs)
+2026-05-03T01:18:51.4616949Z            ^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616976Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 932, in command
+2026-05-03T01:18:51.4616999Z     return command(
+2026-05-03T01:18:51.4617023Z            ^^^^^^^^
+2026-05-03T01:18:51.461705Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/network.py", line 191, in command
+2026-05-03T01:18:51.4617074Z     helpers._check_command_response(
+2026-05-03T01:18:51.4617102Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/helpers.py", line 223, in _check_command_response
+2026-05-03T01:18:51.4617145Z     raise OperationFailure(errmsg, code, response, max_wire_version)
+2026-05-03T01:18:51.4617175Z pymongo.errors.OperationFailure: Invalid key, full error: {'ok': 0.0, 'code': 18, 'codeName': 'AuthenticationFailed', 'errmsg': 'Invalid key'}
+2026-05-03T01:18:51.4617198Z
+2026-05-03T01:18:51.4694789Z ERROR:    Application startup failed. Exiting.
+2026-05-03T01:28:02.5563046Z    _____
+2026-05-03T01:28:02.556499Z   /  _  \ __________ _________   ____
+2026-05-03T01:28:02.5565057Z  /  /_\  \\___   /  |  \_  __ \_/ __ \
+2026-05-03T01:28:02.5565095Z /    |    \/    /|  |  /|  | \/\  ___/
+2026-05-03T01:28:02.5565191Z \____|__  /_____ \____/ |__|    \___  >
+2026-05-03T01:28:02.5565238Z         \/      \/                  \/
+2026-05-03T01:28:02.5565273Z A P P   S E R V I C E   O N   L I N U X
+2026-05-03T01:28:02.5565305Z
+2026-05-03T01:28:02.5565346Z Documentation    : http://aka.ms/webapp-linux
+2026-05-03T01:28:02.5565386Z Python quickstart: https://aka.ms/python-qs
+2026-05-03T01:28:02.556542Z Python version   : 3.11.14
+2026-05-03T01:28:02.5565475Z Instance Name    : lw1sdlwk000I9A
+2026-05-03T01:28:02.556552Z Instance Id      : cb8d91c9d2a29a2894b5445bbfe9d306e91eb996b4b7cdada5ff30dc3f2bfdda
+2026-05-03T01:28:02.5565553Z
+2026-05-03T01:28:02.5565587Z Note: Any data outside '/home' is not persisted
+2026-05-03T01:28:04.8526493Z Starting OpenBSD Secure Shell server: sshd.
+2026-05-03T01:28:04.8826609Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2026-05-03T01:28:05.0124933Z Updating certificates in /etc/ssl/certs...
+2026-05-03T01:28:30.1097679Z rehash: warning: skipping duplicate certificate in azl_Sectigo_Public_Server_Authentication_Root_E46.pem
+2026-05-03T01:28:30.1114678Z rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_ECC_Root_CA_2022.pem
+2026-05-03T01:28:30.1477655Z rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_RSA_Root_CA_2022.pem
+2026-05-03T01:28:30.1881003Z rehash: warning: skipping duplicate certificate in azl_Sectigo_Public_Server_Authentication_Root_R46.pem
+2026-05-03T01:28:30.2885805Z 4 added, 0 removed; done.
+2026-05-03T01:28:30.2886335Z Running hooks in /etc/ca-certificates/update.d...
+2026-05-03T01:28:30.3265816Z done.
+2026-05-03T01:28:30.3585488Z CA certificates copied and updated successfully.
+2026-05-03T01:28:30.6128041Z Site's appCommandLine: uvicorn server:app --host 0.0.0.0 --port 8000
+2026-05-03T01:28:31.3501457Z Starting periodic command scheduler: cron.
+2026-05-03T01:28:31.3502183Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'uvicorn server:app --host 0.0.0.0 --port 8000'
+2026-05-03T01:28:32.0028406Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2026-05-03T01:28:32.0029559Z Build Operation ID: febf26534b130b25
+2026-05-03T01:28:32.0251684Z Oryx Version: 0.2.20260130.1, Commit: a98e9aef5dfb6572a08b0a07ce414e1122ab4a2e, ReleaseTagName: 20260130.1
+2026-05-03T01:28:32.0252587Z Output is compressed. Extracting it...
+2026-05-03T01:28:32.0641732Z Found zstd-compressed tarball.
+2026-05-03T01:28:32.064219Z Extracting '/home/site/wwwroot/output.tar.zst' to directory '/tmp/8dea8ae6d80407f'...
+2026-05-03T01:28:32.0642254Z Using zstd for decompression of file: /home/site/wwwroot/output.tar.zst
+2026-05-03T01:28:59.5871825Z zstd tar Successfully extracted '/home/site/wwwroot/output.tar.zst' to '/tmp/8dea8ae6d80407f'
+2026-05-03T01:28:59.594911Z App path is set to '/tmp/8dea8ae6d80407f'
+2026-05-03T01:28:59.6344544Z Writing output script to '/opt/startup/startup.sh'
+2026-05-03T01:28:59.8555209Z Using packages from virtual environment antenv located at /tmp/8dea8ae6d80407f/antenv.
+2026-05-03T01:28:59.8555879Z Updated PYTHONPATH to '/opt/startup/app_logs:/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages'
+2026-05-03T01:29:05.9575771Z 2026-05-03 01:29:05,951 INFO [alivio] Database provider: azure_documentdb · DB: alivio
+2026-05-03T01:29:06.4290804Z 2026-05-03 01:29:06,428 INFO [alivio] CORS allowed origins: ['https://www.aliviosearch.cloud', 'http://127.0.0.1:3000', 'http://localhost:3000', 'https://aliviosearch.cloud']
+2026-05-03T01:29:06.4468617Z INFO:     Started server process [1905]
+2026-05-03T01:29:06.44691Z INFO:     Waiting for application startup.
+2026-05-03T01:29:08.5956556Z 2026-05-03 01:29:08,593 INFO [alivio] Seeded admin user admin@alivio.ai
+2026-05-03T01:29:08.5957255Z INFO:     Application startup complete.
+2026-05-03T01:29:08.595731Z INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03T01:29:09.1911882Z INFO:     169.254.129.1:43377 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-05-03T01:29:12.1660222Z INFO:     169.254.129.1:43383 - "GET /health HTTP/1.1" 200 OK
+2026-05-03T01:29:18.7174775Z INFO:     169.254.129.1:25407 - "GET /api/health HTTP/1.1" 200 OK
+2026-05-03T01:29:19.0100969Z INFO:     169.254.129.1:25407 - "GET / HTTP/1.1" 404 Not Found
+2026-05-03T01:29:19.2824986Z INFO:     169.254.129.1:25407 - "GET /docs HTTP/1.1" 200 OK
+2026-05-03T01:29:19.7856004Z INFO:     169.254.129.1:25407 - "GET /openapi.json HTTP/1.1" 200 OK
+2026-05-03T01:30:33.478Z No new trace in the past 1 min(s).
