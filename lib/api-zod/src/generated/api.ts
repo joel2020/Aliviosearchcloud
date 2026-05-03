@@ -670,6 +670,52 @@ export const SubscribeToBlogResponse = zod.object({
 });
 
 /**
+ * Public endpoint. Captures a contact-form submission (name, email,
+message, etc.) so the team can follow up. Rate-limited per IP.
+
+ * @summary Submit a contact form message
+ */
+export const submitContactBodyNameMax = 120;
+
+export const submitContactBodyBusinessNameMax = 200;
+
+export const submitContactBodyEmailMin = 3;
+export const submitContactBodyEmailMax = 254;
+
+export const submitContactBodyPhoneMax = 40;
+
+export const submitContactBodyMessageMax = 5000;
+
+export const submitContactBodySourceMax = 64;
+
+export const submitContactBodySourceRegExp = new RegExp(
+  "^[a-z0-9][a-z0-9-]{0,63}$",
+);
+
+export const SubmitContactBody = zod.object({
+  name: zod.string().min(1).max(submitContactBodyNameMax),
+  businessName: zod.string().max(submitContactBodyBusinessNameMax).nullish(),
+  email: zod
+    .string()
+    .email()
+    .min(submitContactBodyEmailMin)
+    .max(submitContactBodyEmailMax),
+  phone: zod.string().max(submitContactBodyPhoneMax).nullish(),
+  preferredChannel: zod.enum(["email", "sms", "whatsapp"]),
+  message: zod.string().min(1).max(submitContactBodyMessageMax),
+  source: zod
+    .string()
+    .min(1)
+    .max(submitContactBodySourceMax)
+    .regex(submitContactBodySourceRegExp)
+    .nullish(),
+});
+
+export const SubmitContactResponse = zod.object({
+  ok: zod.boolean(),
+});
+
+/**
  * @summary Smoke-test every agent (admin only)
  */
 export const SmokeTestAgentsResponse = zod.object({

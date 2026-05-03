@@ -10,6 +10,8 @@ export type SeoOptions = {
   path: string;
   /** Optional override for the OpenGraph image. Defaults to /opengraph.jpg. */
   ogImage?: string;
+  /** When true, emits `<meta name="robots" content="noindex,follow">`. Use for 404, thank-you, gated, or low-value pages. */
+  noIndex?: boolean;
 };
 
 const SITE_NAME = "Alivio Search Cloud";
@@ -50,7 +52,7 @@ function originSafe(): string {
  * change. Falls back to static meta in `index.html` when JS hasn't run yet
  * (relevant for crawlers that don't execute JS — see sitemap.xml).
  */
-export function useSeo({ title, description, path, ogImage }: SeoOptions): void {
+export function useSeo({ title, description, path, ogImage, noIndex }: SeoOptions): void {
   useEffect(() => {
     const origin = originSafe();
     const cleanBase = basePath || "";
@@ -105,5 +107,12 @@ export function useSeo({ title, description, path, ogImage }: SeoOptions): void 
       description,
     );
     setMeta('meta[name="twitter:image"]', "name", "twitter:image", og);
-  }, [title, description, path, ogImage]);
+
+    setMeta(
+      'meta[name="robots"]',
+      "name",
+      "robots",
+      noIndex ? "noindex,follow" : "index,follow",
+    );
+  }, [title, description, path, ogImage, noIndex]);
 }

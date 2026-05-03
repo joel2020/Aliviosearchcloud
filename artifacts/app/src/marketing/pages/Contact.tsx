@@ -4,8 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSeo } from "@/marketing/lib/useSeo";
 import { CTAButton } from "@/components/CTAButton";
-import { Phone, Mail, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Phone, Mail, MessageSquare, CheckCircle2, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import { useSubmitContact } from "@workspace/api-client-react";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type Channel = "email" | "sms" | "whatsapp";
 
 export default function Contact() {
   useSeo({
@@ -14,12 +19,48 @@ export default function Contact() {
     path: "/contact",
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [name, setName] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [channel, setChannel] = useState<Channel>("email");
+  const [message, setMessage] = useState("");
+  const [touched, setTouched] = useState(false);
+
+  const submit = useSubmitContact();
+  const submitted = submit.isSuccess;
+
+  const trimmedEmail = email.trim();
+  const emailValid = EMAIL_RE.test(trimmedEmail);
+  const formValid =
+    name.trim().length > 0 && emailValid && message.trim().length > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted");
-    setSubmitted(true);
+    setTouched(true);
+    if (!formValid || submit.isPending) return;
+    submit.mutate({
+      data: {
+        name: name.trim(),
+        businessName: businessName.trim() || null,
+        email: trimmedEmail,
+        phone: phone.trim() || null,
+        preferredChannel: channel,
+        message: message.trim(),
+        source: "contact-page",
+      },
+    });
+  };
+
+  const reset = () => {
+    submit.reset();
+    setName("");
+    setBusinessName("");
+    setEmail("");
+    setPhone("");
+    setChannel("email");
+    setMessage("");
+    setTouched(false);
   };
 
   return (
@@ -80,40 +121,81 @@ export default function Contact() {
 
             <div className="lg:col-span-3 rounded-2xl border border-border/50 bg-card/50 p-8 md:p-10 backdrop-blur-sm">
               {submitted ? (
-                <div className="text-center py-16">
+                <div className="text-center py-16" data-testid="contact-success">
                   <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-6" />
                   <h3 className="text-2xl font-bold mb-4">Message received.</h3>
-                  <p className="text-muted-foreground mb-8">We'll get back to you shortly. Our agents are already on it.</p>
-                  <Button variant="outline" onClick={() => setSubmitted(false)}>Send another message</Button>
+                  <p className="text-muted-foreground mb-8">We'll get back to you within one business day.</p>
+                  <Button variant="outline" onClick={reset}>Send another message</Button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6" noValidate data-testid="contact-form">
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="name" className="text-sm font-medium">Name</label>
-                      <Input id="name" required className="bg-background" />
+                      <Input
+                        id="name"
+                        required
+                        className="bg-background"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        disabled={submit.isPending}
+                        data-testid="input-name"
+                      />
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="business" className="text-sm font-medium">Business Name</label>
-                      <Input id="business" required className="bg-background" />
+                      <Input
+                        id="business"
+                        className="bg-background"
+                        value={businessName}
+                        onChange={(e) => setBusinessName(e.target.value)}
+                        disabled={submit.isPending}
+                        data-testid="input-business"
+                      />
                     </div>
                   </div>
-                  
+
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="email" className="text-sm font-medium">Email</label>
-                      <Input id="email" type="email" required className="bg-background" />
+                      <Input
+                        id="email"
+                        type="email"
+                        required
+                        className="bg-background"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => setTouched(true)}
+                        disabled={submit.isPending}
+                        aria-invalid={touched && !emailValid ? "true" : "false"}
+                        data-testid="input-email"
+                      />
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="phone" className="text-sm font-medium">Phone (Optional)</label>
-                      <Input id="phone" type="tel" className="bg-background" />
+                      <Input
+                        id="phone"
+                        type="tel"
+                        className="bg-background"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        disabled={submit.isPending}
+                        data-testid="input-phone"
+                      />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="channel" className="text-sm font-medium">Preferred Contact Channel</label>
-                    <select id="channel" className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                      <option value="web">Email</option>
+                    <select
+                      id="channel"
+                      value={channel}
+                      onChange={(e) => setChannel(e.target.value as Channel)}
+                      disabled={submit.isPending}
+                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      data-testid="select-channel"
+                    >
+                      <option value="email">Email</option>
                       <option value="sms">SMS</option>
                       <option value="whatsapp">WhatsApp</option>
                     </select>
@@ -121,11 +203,40 @@ export default function Contact() {
 
                   <div className="space-y-2">
                     <label htmlFor="message" className="text-sm font-medium">Message</label>
-                    <Textarea id="message" required rows={5} className="bg-background resize-none" />
+                    <Textarea
+                      id="message"
+                      required
+                      rows={5}
+                      className="bg-background resize-none"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      disabled={submit.isPending}
+                      data-testid="input-message"
+                    />
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full">
-                    Send Message
+                  {touched && !formValid ? (
+                    <p className="inline-flex items-center gap-1.5 text-sm text-destructive" role="alert">
+                      <AlertCircle className="h-4 w-4" aria-hidden="true" />
+                      Please fill in your name, a valid email, and a message.
+                    </p>
+                  ) : null}
+
+                  {submit.isError ? (
+                    <p className="inline-flex items-center gap-1.5 text-sm text-destructive" role="alert" data-testid="contact-error">
+                      <AlertCircle className="h-4 w-4" aria-hidden="true" />
+                      Couldn't send your message. Please try again, or email hello@aliviosearch.cloud.
+                    </p>
+                  ) : null}
+
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full"
+                    disabled={submit.isPending}
+                    data-testid="submit-contact"
+                  >
+                    {submit.isPending ? "Sending…" : "Send Message"}
                   </Button>
                 </form>
               )}

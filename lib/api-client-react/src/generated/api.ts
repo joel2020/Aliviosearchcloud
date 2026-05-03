@@ -26,6 +26,8 @@ import type {
   BlogSubscribeInput,
   BlogSubscribeResponse,
   Business,
+  ContactSubmitInput,
+  ContactSubmitResponse,
   CreateAssistantConversationInput,
   CreateMessagingConnectionInput,
   CurrentUser,
@@ -2020,6 +2022,95 @@ export const useSubscribeToBlog = <
   TContext
 > => {
   return useMutation(getSubscribeToBlogMutationOptions(options));
+};
+
+/**
+ * Public endpoint. Captures a contact-form submission (name, email,
+message, etc.) so the team can follow up. Rate-limited per IP.
+
+ * @summary Submit a contact form message
+ */
+export const getSubmitContactUrl = () => {
+  return `/api/contact/submit`;
+};
+
+export const submitContact = async (
+  contactSubmitInput: ContactSubmitInput,
+  options?: RequestInit,
+): Promise<ContactSubmitResponse> => {
+  return customFetch<ContactSubmitResponse>(getSubmitContactUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(contactSubmitInput),
+  });
+};
+
+export const getSubmitContactMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitContact>>,
+    TError,
+    { data: BodyType<ContactSubmitInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitContact>>,
+  TError,
+  { data: BodyType<ContactSubmitInput> },
+  TContext
+> => {
+  const mutationKey = ["submitContact"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitContact>>,
+    { data: BodyType<ContactSubmitInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return submitContact(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitContactMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitContact>>
+>;
+export type SubmitContactMutationBody = BodyType<ContactSubmitInput>;
+export type SubmitContactMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Submit a contact form message
+ */
+export const useSubmitContact = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitContact>>,
+    TError,
+    { data: BodyType<ContactSubmitInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof submitContact>>,
+  TError,
+  { data: BodyType<ContactSubmitInput> },
+  TContext
+> => {
+  return useMutation(getSubmitContactMutationOptions(options));
 };
 
 /**

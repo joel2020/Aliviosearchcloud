@@ -32,7 +32,7 @@ export default function Agents() {
             </div>
             <p className="text-muted-foreground mb-4 leading-relaxed">{agent.description}</p>
             <p className="text-sm font-medium text-foreground/80 leading-relaxed">
-              What it does: Working 24/7, this agent ensures your business never drops the ball. It integrates seamlessly into your existing workflow to handle repetitive tasks at superhuman speed and quality, freeing you to focus on closing deals and strategy.
+              {agent.outcome}
             </p>
           </div>
         ))}

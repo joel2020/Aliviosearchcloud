@@ -398,6 +398,48 @@ export interface BlogSubscribeResponse {
   alreadySubscribed: boolean;
 }
 
+export type ContactSubmitInputPreferredChannel =
+  (typeof ContactSubmitInputPreferredChannel)[keyof typeof ContactSubmitInputPreferredChannel];
+
+export const ContactSubmitInputPreferredChannel = {
+  email: "email",
+  sms: "sms",
+  whatsapp: "whatsapp",
+} as const;
+
+export interface ContactSubmitInput {
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  name: string;
+  /** @maxLength 200 */
+  businessName?: string | null;
+  /**
+   * @minLength 3
+   * @maxLength 254
+   */
+  email: string;
+  /** @maxLength 40 */
+  phone?: string | null;
+  preferredChannel: ContactSubmitInputPreferredChannel;
+  /**
+   * @minLength 1
+   * @maxLength 5000
+   */
+  message: string;
+  /**
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9][a-z0-9-]{0,63}$
+   */
+  source?: string | null;
+}
+
+export interface ContactSubmitResponse {
+  ok: boolean;
+}
+
 export interface VerifyMessagingConnectionInput {
   /**
    * 6-digit numeric verification code

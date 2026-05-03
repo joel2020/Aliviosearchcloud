@@ -34,6 +34,8 @@ tags:
     description: Twilio WhatsApp/SMS channel connections and inbound webhook
   - name: blog
     description: Public blog endpoints (newsletter signup)
+  - name: contact
+    description: Public contact form submissions
 paths:
   /healthz:
     get:
@@ -664,6 +666,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /contact/submit:
+    post:
+      operationId: submitContact
+      tags: [contact]
+      summary: Submit a contact form message
+      description: |
+        Public endpoint. Captures a contact-form submission (name, email,
+        message, etc.) so the team can follow up. Rate-limited per IP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactSubmitInput"
+      responses:
+        "200":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactSubmitResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /admin/agents/smoke-test:
     post:
       operationId: smokeTestAgents
@@ -1274,6 +1309,46 @@ components:
         alreadySubscribed:
           type: boolean
       required: [ok, alreadySubscribed]
+    ContactSubmitInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        businessName:
+          type: string
+          maxLength: 200
+          nullable: true
+        email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 254
+        phone:
+          type: string
+          maxLength: 40
+          nullable: true
+        preferredChannel:
+          type: string
+          enum: [email, sms, whatsapp]
+        message:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        source:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: "^[a-z0-9][a-z0-9-]{0,63}$"
+          nullable: true
+      required: [name, email, preferredChannel, message]
+    ContactSubmitResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required: [ok]
     VerifyMessagingConnectionInput:
       type: object
       properties:
