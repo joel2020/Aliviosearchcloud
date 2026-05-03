@@ -54,3 +54,101 @@ export interface UpdateBusinessBody {
   /** @maxLength 500 */
   logoUrl?: string;
 }
+
+export type AgentSummaryMode =
+  (typeof AgentSummaryMode)[keyof typeof AgentSummaryMode];
+
+export const AgentSummaryMode = {
+  structured: "structured",
+  text: "text",
+} as const;
+
+export interface AgentSummary {
+  id: string;
+  name: string;
+  description: string;
+  mode: AgentSummaryMode;
+}
+
+export type RunAgentRequestInput = { [key: string]: unknown };
+
+export interface RunAgentRequest {
+  input: RunAgentRequestInput;
+}
+
+export type AgentRunInput = { [key: string]: unknown } | null;
+
+export type AgentRunOutput = { [key: string]: unknown } | null;
+
+export interface AgentRun {
+  id: string;
+  businessId: string;
+  userId: string;
+  agentSlug: string;
+  status: string;
+  input?: AgentRunInput;
+  output?: AgentRunOutput;
+  errorMessage?: string | null;
+  tokensUsed?: number | null;
+  startedAt: string;
+  completedAt?: string | null;
+}
+
+export type ServiceStatusValue =
+  (typeof ServiceStatusValue)[keyof typeof ServiceStatusValue];
+
+export const ServiceStatusValue = {
+  ok: "ok",
+  configured: "configured",
+  not_configured: "not_configured",
+  error: "error",
+} as const;
+
+export type ServiceStatusMessaging = {
+  twilio: ServiceStatusValue;
+  whatsapp: ServiceStatusValue;
+};
+
+export interface ServiceStatus {
+  api: ServiceStatusValue;
+  database: ServiceStatusValue;
+  ai_provider: ServiceStatusValue;
+  stripe: ServiceStatusValue;
+  cal_link: ServiceStatusValue;
+  messaging: ServiceStatusMessaging;
+}
+
+export type SmokeTestResultStatus =
+  (typeof SmokeTestResultStatus)[keyof typeof SmokeTestResultStatus];
+
+export const SmokeTestResultStatus = {
+  pass: "pass",
+  fail: "fail",
+  not_configured: "not_configured",
+} as const;
+
+export interface SmokeTestResult {
+  id: string;
+  name: string;
+  status: SmokeTestResultStatus;
+  latencyMs: number;
+  error?: string | null;
+  preview?: string | null;
+}
+
+export interface SmokeTestReport {
+  runAt: string;
+  passed: number;
+  failed: number;
+  notConfigured: number;
+  results: SmokeTestResult[];
+}
+
+export type ListAgentRunsParams = {
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  limit?: number;
+  agentId?: string;
+};

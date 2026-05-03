@@ -12,6 +12,7 @@
   "dependencies": {
     "@clerk/express": "^1.7.0",
     "@clerk/shared": "^3.21.0",
+    "@workspace/agents": "workspace:*",
     "@workspace/api-zod": "workspace:*",
     "@workspace/azure-openai": "workspace:*",
     "@workspace/db": "workspace:*",

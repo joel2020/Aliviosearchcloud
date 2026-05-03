@@ -176,6 +176,9 @@ importers:
       '@clerk/shared':
         specifier: ^3.21.0
         version: 3.47.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@workspace/agents':
+        specifier: workspace:*
+        version: link:../../lib/agents
       '@workspace/api-zod':
         specifier: workspace:*
         version: link:../../lib/api-zod
@@ -615,6 +618,28 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 3.25.76
+
+  lib/agents:
+    dependencies:
+      '@workspace/azure-openai':
+        specifier: workspace:*
+        version: link:../azure-openai
+      '@workspace/db':
+        specifier: workspace:*
+        version: link:../db
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.45.2(@types/pg@8.18.0)(pg@8.20.0)
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.3.5
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
 
   lib/api-client-react:
     dependencies:

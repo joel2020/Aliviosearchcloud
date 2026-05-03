@@ -8,7 +8,6 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -16,7 +15,22 @@ export const HealthCheckResponse = zod.object({
 });
 
 /**
- * Returns the signed-in user, syncing the local record on first access.
+ * Returns the configured/connected status of every backing service. Never returns secret values.
+ * @summary Service status overview
+ */
+export const GetStatusResponse = zod.object({
+  api: zod.enum(["ok", "configured", "not_configured", "error"]),
+  database: zod.enum(["ok", "configured", "not_configured", "error"]),
+  ai_provider: zod.enum(["ok", "configured", "not_configured", "error"]),
+  stripe: zod.enum(["ok", "configured", "not_configured", "error"]),
+  cal_link: zod.enum(["ok", "configured", "not_configured", "error"]),
+  messaging: zod.object({
+    twilio: zod.enum(["ok", "configured", "not_configured", "error"]),
+    whatsapp: zod.enum(["ok", "configured", "not_configured", "error"]),
+  }),
+});
+
+/**
  * @summary Current authenticated user
  */
 export const GetCurrentUserResponse = zod.object({
@@ -29,7 +43,6 @@ export const GetCurrentUserResponse = zod.object({
 });
 
 /**
- * Returns the active business workspace for the signed-in user, creating one on first access.
  * @summary Current business workspace
  */
 export const GetCurrentBusinessResponse = zod.object({
@@ -91,4 +104,111 @@ export const UpdateCurrentBusinessResponse = zod.object({
   logoUrl: zod.string().nullish(),
   createdAt: zod.coerce.date(),
   updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary List all available agents
+ */
+export const ListAgentsResponseItem = zod.object({
+  id: zod.string(),
+  name: zod.string(),
+  description: zod.string(),
+  mode: zod.enum(["structured", "text"]),
+});
+export const ListAgentsResponse = zod.array(ListAgentsResponseItem);
+
+/**
+ * @summary Run an agent
+ */
+export const RunAgentParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const RunAgentBody = zod.object({
+  input: zod.record(zod.string(), zod.unknown()),
+});
+
+export const RunAgentResponse = zod.object({
+  id: zod.string(),
+  businessId: zod.string(),
+  userId: zod.string(),
+  agentSlug: zod.string(),
+  status: zod.string(),
+  input: zod.record(zod.string(), zod.unknown()).nullish(),
+  output: zod.record(zod.string(), zod.unknown()).nullish(),
+  errorMessage: zod.string().nullish(),
+  tokensUsed: zod.number().nullish(),
+  startedAt: zod.coerce.date(),
+  completedAt: zod.coerce.date().nullish(),
+});
+
+/**
+ * @summary List recent agent runs for the current business
+ */
+export const listAgentRunsQueryLimitDefault = 25;
+export const listAgentRunsQueryLimitMax = 100;
+
+export const ListAgentRunsQueryParams = zod.object({
+  limit: zod.coerce
+    .number()
+    .min(1)
+    .max(listAgentRunsQueryLimitMax)
+    .default(listAgentRunsQueryLimitDefault),
+  agentId: zod.coerce.string().optional(),
+});
+
+export const ListAgentRunsResponseItem = zod.object({
+  id: zod.string(),
+  businessId: zod.string(),
+  userId: zod.string(),
+  agentSlug: zod.string(),
+  status: zod.string(),
+  input: zod.record(zod.string(), zod.unknown()).nullish(),
+  output: zod.record(zod.string(), zod.unknown()).nullish(),
+  errorMessage: zod.string().nullish(),
+  tokensUsed: zod.number().nullish(),
+  startedAt: zod.coerce.date(),
+  completedAt: zod.coerce.date().nullish(),
+});
+export const ListAgentRunsResponse = zod.array(ListAgentRunsResponseItem);
+
+/**
+ * @summary Single agent run
+ */
+export const GetAgentRunParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const GetAgentRunResponse = zod.object({
+  id: zod.string(),
+  businessId: zod.string(),
+  userId: zod.string(),
+  agentSlug: zod.string(),
+  status: zod.string(),
+  input: zod.record(zod.string(), zod.unknown()).nullish(),
+  output: zod.record(zod.string(), zod.unknown()).nullish(),
+  errorMessage: zod.string().nullish(),
+  tokensUsed: zod.number().nullish(),
+  startedAt: zod.coerce.date(),
+  completedAt: zod.coerce.date().nullish(),
+});
+
+/**
+ * @summary Smoke-test every agent (admin only)
+ */
+export const SmokeTestAgentsResponse = zod.object({
+  runAt: zod.coerce.date(),
+  passed: zod.number(),
+  failed: zod.number(),
+  notConfigured: zod.number(),
+  results: zod.array(
+    zod.object({
+      id: zod.string(),
+      name: zod.string(),
+      status: zod.enum(["pass", "fail", "not_configured"]),
+      latencyMs: zod.number(),
+      error: zod.string().nullish(),
+      preview: zod.string().nullish(),
+    }),
+  ),
 });

@@ -14,13 +14,20 @@ tags:
     description: Authentication and current user
   - name: businesses
     description: Business workspace operations
+  - name: agents
+    description: AI agent execution
+  - name: agent-runs
+    description: Agent run history
+  - name: status
+    description: Service status
+  - name: admin
+    description: Admin-only endpoints
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -28,12 +35,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /status:
+    get:
+      operationId: getStatus
+      tags: [status]
+      summary: Service status overview
+      description: Returns the configured/connected status of every backing service. Never returns secret values.
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceStatus"
   /auth/me:
     get:
       operationId: getCurrentUser
       tags: [auth]
       summary: Current authenticated user
-      description: Returns the signed-in user, syncing the local record on first access.
       responses:
         "200":
           description: Authenticated user
@@ -52,7 +71,6 @@ paths:
       operationId: getCurrentBusiness
       tags: [businesses]
       summary: Current business workspace
-      description: Returns the active business workspace for the signed-in user, creating one on first access.
       responses:
         "200":
           description: Current business
@@ -85,6 +103,154 @@ paths:
                 $ref: "#/components/schemas/Business"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /agents:
+    get:
+      operationId: listAgents
+      tags: [agents]
+      summary: List all available agents
+      responses:
+        "200":
+          description: Agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentSummary"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /agents/{id}/run:
+    post:
+      operationId: runAgent
+      tags: [agents]
+      summary: Run an agent
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RunAgentRequest"
+      responses:
+        "200":
+          description: Agent run record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentRun"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Agent not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /agent-runs:
+    get:
+      operationId: listAgentRuns
+      tags: [agent-runs]
+      summary: List recent agent runs for the current business
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+        - in: query
+          name: agentId
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Agent runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentRun"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /agent-runs/{id}:
+    get:
+      operationId: getAgentRun
+      tags: [agent-runs]
+      summary: Single agent run
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Agent run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentRun"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /admin/agents/smoke-test:
+    post:
+      operationId: smokeTestAgents
+      tags: [admin]
+      summary: Smoke-test every agent (admin only)
+      responses:
+        "200":
+          description: Smoke test results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SmokeTestReport"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden — not an admin
           content:
             application/json:
               schema:
@@ -179,3 +345,120 @@ components:
         logoUrl:
           type: string
           maxLength: 500
+    AgentSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        mode:
+          type: string
+          enum: [structured, text]
+      required: [id, name, description, mode]
+    RunAgentRequest:
+      type: object
+      properties:
+        input:
+          type: object
+          additionalProperties: true
+      required: [input]
+    AgentRun:
+      type: object
+      properties:
+        id:
+          type: string
+        businessId:
+          type: string
+        userId:
+          type: string
+        agentSlug:
+          type: string
+        status:
+          type: string
+        input:
+          type: object
+          additionalProperties: true
+          nullable: true
+        output:
+          type: object
+          additionalProperties: true
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+        tokensUsed:
+          type: integer
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, businessId, userId, agentSlug, status, startedAt]
+    ServiceStatusValue:
+      type: string
+      enum: [ok, configured, not_configured, error]
+    ServiceStatus:
+      type: object
+      properties:
+        api:
+          $ref: "#/components/schemas/ServiceStatusValue"
+        database:
+          $ref: "#/components/schemas/ServiceStatusValue"
+        ai_provider:
+          $ref: "#/components/schemas/ServiceStatusValue"
+        stripe:
+          $ref: "#/components/schemas/ServiceStatusValue"
+        cal_link:
+          $ref: "#/components/schemas/ServiceStatusValue"
+        messaging:
+          type: object
+          properties:
+            twilio:
+              $ref: "#/components/schemas/ServiceStatusValue"
+            whatsapp:
+              $ref: "#/components/schemas/ServiceStatusValue"
+          required: [twilio, whatsapp]
+      required:
+        [api, database, ai_provider, stripe, cal_link, messaging]
+    SmokeTestResult:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum: [pass, fail, not_configured]
+        latencyMs:
+          type: integer
+        error:
+          type: string
+          nullable: true
+        preview:
+          type: string
+          nullable: true
+      required: [id, name, status, latencyMs]
+    SmokeTestReport:
+      type: object
+      properties:
+        runAt:
+          type: string
+          format: date-time
+        passed:
+          type: integer
+        failed:
+          type: integer
+        notConfigured:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmokeTestResult"
+      required: [runAt, passed, failed, notConfigured, results]
