@@ -41,28 +41,44 @@ router.post(
       }> = [];
 
       for (const agent of agentRegistry.list()) {
-        const { run, latencyMs } = await executeAgentRun({
-          agent,
-          rawInput: agent.smokeInput,
-          user,
-          business,
-          log,
-        });
-
-        const status: "pass" | "fail" | "not_configured" =
-          run.status === "ok"
-            ? "pass"
-            : run.status === "not_configured"
-              ? "not_configured"
-              : "fail";
-        results.push({
-          id: agent.id,
-          name: agent.name,
-          status,
-          latencyMs,
-          error: run.errorMessage ?? null,
-          preview: status === "pass" ? previewOutput(run.output) : null,
-        });
+        const t0 = Date.now();
+        try {
+          const { run, latencyMs } = await executeAgentRun({
+            agent,
+            rawInput: agent.smokeInput,
+            user,
+            business,
+            log,
+          });
+          const status: "pass" | "fail" | "not_configured" =
+            run.status === "ok"
+              ? "pass"
+              : run.status === "not_configured"
+                ? "not_configured"
+                : "fail";
+          results.push({
+            id: agent.id,
+            name: agent.name,
+            status,
+            latencyMs,
+            error: run.errorMessage ?? null,
+            preview: status === "pass" ? previewOutput(run.output) : null,
+          });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          log.error(
+            { agentId: agent.id, err: message },
+            "agent_smoke_test_unexpected_error",
+          );
+          results.push({
+            id: agent.id,
+            name: agent.name,
+            status: "fail",
+            latencyMs: Date.now() - t0,
+            error: `Unhandled error: ${message}`,
+            preview: null,
+          });
+        }
       }
 
       const passed = results.filter((r) => r.status === "pass").length;
