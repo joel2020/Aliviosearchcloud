@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" fill="none">
+  <defs>
+    <linearGradient id="alivio-mark" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(4 4)">
+    <rect width="48" height="48" rx="12" fill="url(#alivio-mark)"/>
+    <path d="M14 33 L24 14 L34 33" stroke="#0A1020" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="24" cy="29" r="3" fill="#0A1020"/>
+  </g>
+  <g fill="currentColor">
+    <text x="64" y="36" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="22" letter-spacing="-0.5">Alivio</text>
+    <text x="138" y="36" font-family="Inter, system-ui, sans-serif" font-weight="400" font-size="22" letter-spacing="-0.5" opacity="0.7">Search</text>
+  </g>
+</svg>

@@ -10,14 +10,19 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@clerk/express": "^1.7.0",
+    "@clerk/shared": "^3.21.0",
     "@workspace/api-zod": "workspace:*",
+    "@workspace/azure-openai": "workspace:*",
     "@workspace/db": "workspace:*",
     "cookie-parser": "^1.4.7",
     "cors": "^2",
     "drizzle-orm": "catalog:",
     "express": "^5",
+    "http-proxy-middleware": "^3.0.5",
     "pino": "^9",
-    "pino-http": "^10"
+    "pino-http": "^10",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",

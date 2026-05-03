@@ -3,13 +3,17 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Alivio Search Cloud customer API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication and current user
+  - name: businesses
+    description: Business workspace operations
 paths:
   /healthz:
     get:
@@ -24,6 +28,67 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Current authenticated user
+      description: Returns the signed-in user, syncing the local record on first access.
+      responses:
+        "200":
+          description: Authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUser"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /businesses/current:
+    get:
+      operationId: getCurrentBusiness
+      tags: [businesses]
+      summary: Current business workspace
+      description: Returns the active business workspace for the signed-in user, creating one on first access.
+      responses:
+        "200":
+          description: Current business
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Business"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateCurrentBusiness
+      tags: [businesses]
+      summary: Update the current business workspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBusinessBody"
+      responses:
+        "200":
+          description: Updated business
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Business"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -31,6 +96,86 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
-
+      required: [status]
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error]
+    CurrentUser:
+      type: object
+      properties:
+        id:
+          type: string
+        clerkId:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, clerkId, email, createdAt]
+    Business:
+      type: object
+      properties:
+        id:
+          type: string
+        ownerId:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        industry:
+          type: string
+          nullable: true
+        websiteUrl:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        brandColor:
+          type: string
+          nullable: true
+        logoUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, ownerId, name, slug, createdAt, updatedAt]
+    UpdateBusinessBody:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        industry:
+          type: string
+          maxLength: 200
+        websiteUrl:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+          maxLength: 2000
+        brandColor:
+          type: string
+          maxLength: 32
+        logoUrl:
+          type: string
+          maxLength: 500
