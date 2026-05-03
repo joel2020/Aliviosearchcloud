@@ -6,3 +6,7 @@ export * from "./assistantMessages";
 export * from "./assistantChannelConnections";
 export * from "./blogSubscribers";
 export * from "./contactSubmissions";
+export * from "./audits";
+export * from "./leads";
+export * from "./outreachSequences";
+export * from "./outreachMessages";
