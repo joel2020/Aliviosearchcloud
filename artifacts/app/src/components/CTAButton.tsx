@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { Link } from "wouter";
+import { useAuth } from "@clerk/react";
 import { useGetPublicConfig } from "@workspace/api-client-react";
 import { Button, type ButtonProps } from "@/components/ui/button";
 
@@ -49,8 +50,10 @@ export function CTAButton({
   ...buttonProps
 }: CTAButtonProps) {
   const { data: config } = useGetPublicConfig();
+  const { isSignedIn } = useAuth();
+  const effectiveSignedIn = signedIn ?? isSignedIn;
 
-  const resolved = resolveCta(cta, config, signedIn);
+  const resolved = resolveCta(cta, config, effectiveSignedIn);
   const visibleLabel = resolved.fallback
     ? FALLBACK_LABEL
     : (label ?? DEFAULT_LABELS[cta]);
@@ -101,8 +104,13 @@ function resolveCta(
 ): ResolvedCta {
   switch (cta) {
     case "audit": {
-      // The FREE audit CTA always routes to the in-app audit flow — never to
-      // a Stripe payment link. The paid upgrade is a separate `audit-paid` CTA.
+      // The FREE audit CTA always routes to the in-app audit flow — never to a
+      // Stripe payment link. Signed-in users go straight to the Revenue Leak
+      // Finder agent; signed-out users are sent to sign-up which then funnels
+      // them into the same agent.
+      if (signedIn) {
+        return { href: "/agents/revenue-leak", external: false, fallback: false };
+      }
       return { href: "/sign-up?intent=audit", external: false, fallback: false };
     }
     case "audit-paid": {
