@@ -8,6 +8,7 @@ import {
   AzureOpenAINotConfiguredError,
   getAzureOpenAIClient,
 } from "@workspace/azure-openai";
+import { RunAgentParams, RunAgentBody } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
 import { ensureUser, ensureBusiness } from "../lib/ensure";
 import { persistAgentRun, serializeAgentRun } from "../lib/agentRunStore";
@@ -21,20 +22,28 @@ router.get("/", requireAuth, (_req, res) => {
 router.post("/:id/run", requireAuth, async (req, res, next) => {
   const log = req.log;
   try {
-    const id = req.params["id"];
-    const agent = agentRegistry.get(String(id));
+    const params = RunAgentParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({
+        error: "invalid_params",
+        message: params.error.issues.map((i) => i.message).join(", "),
+      });
+      return;
+    }
+    const body = RunAgentBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({
+        error: "invalid_body",
+        message: body.error.issues.map((i) => i.message).join(", "),
+      });
+      return;
+    }
+    const id = params.data.id;
+    const agent = agentRegistry.get(id);
     if (!agent) {
       res
         .status(404)
         .json({ error: "agent_not_found", message: `Unknown agent id: ${id}` });
-      return;
-    }
-    const body = req.body as { input?: unknown } | undefined;
-    if (!body || typeof body !== "object" || !("input" in body)) {
-      res.status(400).json({
-        error: "invalid_body",
-        message: "Body must be { input: {...} }.",
-      });
       return;
     }
     const user = await ensureUser(req.clerkUserId!);
@@ -50,7 +59,7 @@ router.post("/:id/run", requireAuth, async (req, res, next) => {
           userId: user.id,
           agentSlug: agent.id,
           status: "not_configured",
-          input: (body.input as Record<string, unknown>) ?? {},
+          input: body.data.input as Record<string, unknown>,
           errorMessage: err.message,
         });
         log.warn(
@@ -76,7 +85,7 @@ router.post("/:id/run", requireAuth, async (req, res, next) => {
     };
 
     const startedAt = Date.now();
-    const result = await runAgent({ agent, rawInput: body.input, ctx });
+    const result = await runAgent({ agent, rawInput: body.data.input, ctx });
     const latencyMs = Date.now() - startedAt;
 
     if (result.status === "ok") {
@@ -85,7 +94,7 @@ router.post("/:id/run", requireAuth, async (req, res, next) => {
         userId: user.id,
         agentSlug: agent.id,
         status: "ok",
-        input: (body.input as Record<string, unknown>) ?? {},
+        input: body.data.input as Record<string, unknown>,
         output: result.output,
         tokensUsed: result.tokensUsed,
       });
@@ -117,7 +126,7 @@ router.post("/:id/run", requireAuth, async (req, res, next) => {
       userId: user.id,
       agentSlug: agent.id,
       status: result.status,
-      input: (body.input as Record<string, unknown>) ?? {},
+      input: body.data.input as Record<string, unknown>,
       errorMessage: result.errorMessage,
     });
     log.warn(

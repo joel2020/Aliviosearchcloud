@@ -31,6 +31,7 @@ export interface PersistAgentRunArgs {
 export async function persistAgentRun(
   args: PersistAgentRunArgs,
 ): Promise<AgentRun> {
+  const now = new Date();
   const inserted = await db
     .insert(agentRunsTable)
     .values({
@@ -43,9 +44,9 @@ export async function persistAgentRun(
       output: args.output ?? {},
       errorMessage: args.errorMessage ?? null,
       tokensUsed: args.tokensUsed ?? 0,
+      startedAt: now,
+      completedAt: now,
     })
     .returning();
-  // Stamp completion time.
-  const row = inserted[0]!;
-  return { ...row, completedAt: row.startedAt };
+  return inserted[0]!;
 }

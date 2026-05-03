@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { and, desc, eq } from "drizzle-orm";
 import { db, agentRunsTable } from "@workspace/db";
+import { ListAgentRunsQueryParams, GetAgentRunParams } from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/requireAuth";
 import { ensureUser, ensureBusiness } from "../lib/ensure";
 import { serializeAgentRun } from "../lib/agentRunStore";
@@ -9,13 +10,16 @@ const router: IRouter = Router();
 
 router.get("/", requireAuth, async (req, res, next) => {
   try {
-    const limitRaw = Number(req.query["limit"] ?? 25);
-    const limit = Math.min(
-      100,
-      Math.max(1, Number.isFinite(limitRaw) ? limitRaw : 25),
-    );
-    const agentId =
-      typeof req.query["agentId"] === "string" ? req.query["agentId"] : undefined;
+    const query = ListAgentRunsQueryParams.safeParse(req.query);
+    if (!query.success) {
+      res.status(400).json({
+        error: "invalid_query",
+        message: query.error.issues.map((i) => i.message).join(", "),
+      });
+      return;
+    }
+    const limit = query.data.limit ?? 25;
+    const agentId = query.data.agentId;
 
     const user = await ensureUser(req.clerkUserId!);
     const business = await ensureBusiness(user.id, "My business");
@@ -42,9 +46,17 @@ router.get("/", requireAuth, async (req, res, next) => {
 
 router.get("/:id", requireAuth, async (req, res, next) => {
   try {
+    const params = GetAgentRunParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({
+        error: "invalid_params",
+        message: params.error.issues.map((i) => i.message).join(", "),
+      });
+      return;
+    }
     const user = await ensureUser(req.clerkUserId!);
     const business = await ensureBusiness(user.id, "My business");
-    const id = String(req.params["id"]);
+    const id = params.data.id;
 
     const rows = await db
       .select()

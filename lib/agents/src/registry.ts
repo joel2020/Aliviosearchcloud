@@ -1,5 +1,5 @@
 import type { AgentDefinition, AgentSummary } from "./types";
-import { ALL_AGENTS } from "./agents";
+import { ALL_AGENTS } from "./agents/index";
 
 const byId = new Map<string, AgentDefinition>();
 for (const agent of ALL_AGENTS) {

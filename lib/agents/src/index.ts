@@ -1,4 +1,5 @@
 export * from "./types";
 export * from "./registry";
 export * from "./runner";
-export { ALL_AGENTS } from "./agents";
+export { defineAgent, businessContextBlock } from "./defineAgent";
+export { ALL_AGENTS } from "./agents/index";

@@ -34,6 +34,8 @@ export interface AgentDefinition<
   /** Tiny canned input used by the admin smoke-test endpoint. Uses the input
    * (pre-parse) shape so optional fields with `.default()` may be omitted. */
   smokeInput: z.input<TInput>;
+  /** Versioned prompt identifier (e.g. "revenue-leak@v1") for audit trails. */
+  promptVersion: string;
   /** Optional: temperature override. Default 0.4. */
   temperature?: number;
   /** Optional: max tokens override. */
