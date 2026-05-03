@@ -25,11 +25,13 @@ import type {
   AssistantMessagePairResponse,
   Business,
   CreateAssistantConversationInput,
+  CreateMessagingConnectionInput,
   CurrentUser,
   DashboardSummary,
   ErrorResponse,
   HealthStatus,
   ListAgentRunsParams,
+  MessagingConnection,
   PostAssistantMessageInput,
   PostAssistantMessageParams,
   PublicConfig,
@@ -39,6 +41,7 @@ import type {
   ServiceStatus,
   SmokeTestReport,
   UpdateBusinessBody,
+  VerifyMessagingConnectionInput,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -1590,6 +1593,341 @@ export function useGetPublicConfig<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary List the current business's channel connections
+ */
+export const getListMessagingConnectionsUrl = () => {
+  return `/api/messaging/connections`;
+};
+
+export const listMessagingConnections = async (
+  options?: RequestInit,
+): Promise<MessagingConnection[]> => {
+  return customFetch<MessagingConnection[]>(getListMessagingConnectionsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListMessagingConnectionsQueryKey = () => {
+  return [`/api/messaging/connections`] as const;
+};
+
+export const getListMessagingConnectionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listMessagingConnections>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listMessagingConnections>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListMessagingConnectionsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listMessagingConnections>>
+  > = ({ signal }) => listMessagingConnections({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listMessagingConnections>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListMessagingConnectionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listMessagingConnections>>
+>;
+export type ListMessagingConnectionsQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary List the current business's channel connections
+ */
+
+export function useListMessagingConnections<
+  TData = Awaited<ReturnType<typeof listMessagingConnections>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listMessagingConnections>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListMessagingConnectionsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Start a new WhatsApp/SMS channel connection (sends OTP)
+ */
+export const getCreateMessagingConnectionUrl = () => {
+  return `/api/messaging/connections`;
+};
+
+export const createMessagingConnection = async (
+  createMessagingConnectionInput: CreateMessagingConnectionInput,
+  options?: RequestInit,
+): Promise<MessagingConnection> => {
+  return customFetch<MessagingConnection>(getCreateMessagingConnectionUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createMessagingConnectionInput),
+  });
+};
+
+export const getCreateMessagingConnectionMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMessagingConnection>>,
+    TError,
+    { data: BodyType<CreateMessagingConnectionInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createMessagingConnection>>,
+  TError,
+  { data: BodyType<CreateMessagingConnectionInput> },
+  TContext
+> => {
+  const mutationKey = ["createMessagingConnection"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createMessagingConnection>>,
+    { data: BodyType<CreateMessagingConnectionInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createMessagingConnection(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateMessagingConnectionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createMessagingConnection>>
+>;
+export type CreateMessagingConnectionMutationBody =
+  BodyType<CreateMessagingConnectionInput>;
+export type CreateMessagingConnectionMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Start a new WhatsApp/SMS channel connection (sends OTP)
+ */
+export const useCreateMessagingConnection = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMessagingConnection>>,
+    TError,
+    { data: BodyType<CreateMessagingConnectionInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createMessagingConnection>>,
+  TError,
+  { data: BodyType<CreateMessagingConnectionInput> },
+  TContext
+> => {
+  return useMutation(getCreateMessagingConnectionMutationOptions(options));
+};
+
+/**
+ * @summary Complete OTP verification for a channel connection
+ */
+export const getVerifyMessagingConnectionUrl = (id: string) => {
+  return `/api/messaging/connections/${id}/verify`;
+};
+
+export const verifyMessagingConnection = async (
+  id: string,
+  verifyMessagingConnectionInput: VerifyMessagingConnectionInput,
+  options?: RequestInit,
+): Promise<MessagingConnection> => {
+  return customFetch<MessagingConnection>(getVerifyMessagingConnectionUrl(id), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(verifyMessagingConnectionInput),
+  });
+};
+
+export const getVerifyMessagingConnectionMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof verifyMessagingConnection>>,
+    TError,
+    { id: string; data: BodyType<VerifyMessagingConnectionInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof verifyMessagingConnection>>,
+  TError,
+  { id: string; data: BodyType<VerifyMessagingConnectionInput> },
+  TContext
+> => {
+  const mutationKey = ["verifyMessagingConnection"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof verifyMessagingConnection>>,
+    { id: string; data: BodyType<VerifyMessagingConnectionInput> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return verifyMessagingConnection(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type VerifyMessagingConnectionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof verifyMessagingConnection>>
+>;
+export type VerifyMessagingConnectionMutationBody =
+  BodyType<VerifyMessagingConnectionInput>;
+export type VerifyMessagingConnectionMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Complete OTP verification for a channel connection
+ */
+export const useVerifyMessagingConnection = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof verifyMessagingConnection>>,
+    TError,
+    { id: string; data: BodyType<VerifyMessagingConnectionInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof verifyMessagingConnection>>,
+  TError,
+  { id: string; data: BodyType<VerifyMessagingConnectionInput> },
+  TContext
+> => {
+  return useMutation(getVerifyMessagingConnectionMutationOptions(options));
+};
+
+/**
+ * @summary Disconnect (delete) a channel connection
+ */
+export const getDeleteMessagingConnectionUrl = (id: string) => {
+  return `/api/messaging/connections/${id}`;
+};
+
+export const deleteMessagingConnection = async (
+  id: string,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteMessagingConnectionUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteMessagingConnectionMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMessagingConnection>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteMessagingConnection>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["deleteMessagingConnection"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteMessagingConnection>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteMessagingConnection(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteMessagingConnectionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteMessagingConnection>>
+>;
+
+export type DeleteMessagingConnectionMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Disconnect (delete) a channel connection
+ */
+export const useDeleteMessagingConnection = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMessagingConnection>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteMessagingConnection>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(getDeleteMessagingConnectionMutationOptions(options));
+};
 
 /**
  * @summary Smoke-test every agent (admin only)

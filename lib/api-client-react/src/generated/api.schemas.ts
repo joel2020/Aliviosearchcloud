@@ -236,6 +236,7 @@ export interface PublicConfig {
 export type ServiceStatusMessaging = {
   twilio: ServiceStatusValue;
   whatsapp: ServiceStatusValue;
+  sms: ServiceStatusValue;
 };
 
 export interface ServiceStatus {
@@ -348,6 +349,38 @@ export interface SmokeTestReport {
   failed: number;
   notConfigured: number;
   results: SmokeTestResult[];
+}
+
+export type MessagingChannel =
+  (typeof MessagingChannel)[keyof typeof MessagingChannel];
+
+export const MessagingChannel = {
+  whatsapp: "whatsapp",
+  sms: "sms",
+} as const;
+
+export interface MessagingConnection {
+  id: string;
+  businessId: string;
+  userId: string;
+  channel: MessagingChannel;
+  phoneNumber: string;
+  label?: string | null;
+  verified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMessagingConnectionInput {
+  channel: MessagingChannel;
+  /** E.164 phone number, e.g. +14155551234 */
+  phoneNumber: string;
+  label?: string | null;
+}
+
+export interface VerifyMessagingConnectionInput {
+  /** 6-digit numeric verification code */
+  code: string;
 }
 
 export type SearchWorkspaceParams = {

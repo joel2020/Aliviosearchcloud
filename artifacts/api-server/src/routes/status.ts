@@ -6,6 +6,7 @@ import {
   getAzureOpenAIConfig,
 } from "@workspace/azure-openai";
 import { getPublicConfig } from "../lib/publicConfig";
+import { getMessagingPublicStatus } from "../lib/messagingConfig";
 
 const router: IRouter = Router();
 
@@ -42,13 +43,10 @@ router.get("/", async (req, res) => {
   const publicConfig = getPublicConfig();
   const stripe: StatusValue = publicConfig.status.stripe;
   const calLink: StatusValue = publicConfig.status.cal;
-  const twilio: StatusValue =
-    process.env["TWILIO_ACCOUNT_SID"] && process.env["TWILIO_AUTH_TOKEN"]
-      ? "configured"
-      : "not_configured";
-  const whatsapp: StatusValue = process.env["TWILIO_WHATSAPP_FROM"]
-    ? "configured"
-    : "not_configured";
+  // Messaging status comes from the same source of truth as the messaging
+  // routes so the dashboard, /api/status, and the actual webhook cannot
+  // disagree about whether Twilio is configured.
+  const messaging = getMessagingPublicStatus();
 
   res.json({
     api: "ok",
@@ -56,7 +54,11 @@ router.get("/", async (req, res) => {
     ai_provider: aiProvider,
     stripe,
     cal_link: calLink,
-    messaging: { twilio, whatsapp },
+    messaging: {
+      twilio: messaging.twilio satisfies StatusValue,
+      whatsapp: messaging.whatsapp satisfies StatusValue,
+      sms: messaging.sms satisfies StatusValue,
+    },
   });
 });
 

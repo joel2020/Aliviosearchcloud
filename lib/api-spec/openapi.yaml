@@ -30,6 +30,8 @@ tags:
     description: Business Assistant chat
   - name: config
     description: Public runtime configuration
+  - name: messaging
+    description: Twilio WhatsApp/SMS channel connections and inbound webhook
 paths:
   /healthz:
     get:
@@ -520,6 +522,111 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PublicConfig"
+  /messaging/connections:
+    get:
+      operationId: listMessagingConnections
+      tags: [messaging]
+      summary: List the current business's channel connections
+      responses:
+        "200":
+          description: Connections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MessagingConnection"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createMessagingConnection
+      tags: [messaging]
+      summary: Start a new WhatsApp/SMS channel connection (sends OTP)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMessagingConnectionInput"
+      responses:
+        "200":
+          description: Pending connection (OTP sent)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessagingConnection"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Messaging not configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /messaging/connections/{id}/verify:
+    post:
+      operationId: verifyMessagingConnection
+      tags: [messaging]
+      summary: Complete OTP verification for a channel connection
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyMessagingConnectionInput"
+      responses:
+        "200":
+          description: Verified connection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessagingConnection"
+        "400":
+          description: Invalid or expired code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Connection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /messaging/connections/{id}:
+    delete:
+      operationId: deleteMessagingConnection
+      tags: [messaging]
+      summary: Disconnect (delete) a channel connection
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /admin/agents/smoke-test:
     post:
       operationId: smokeTestAgents
@@ -921,7 +1028,9 @@ components:
               $ref: "#/components/schemas/ServiceStatusValue"
             whatsapp:
               $ref: "#/components/schemas/ServiceStatusValue"
-          required: [twilio, whatsapp]
+            sms:
+              $ref: "#/components/schemas/ServiceStatusValue"
+          required: [twilio, whatsapp, sms]
       required:
         [api, database, ai_provider, stripe, cal_link, messaging]
     SmokeTestResult:
@@ -1064,3 +1173,51 @@ components:
           items:
             $ref: "#/components/schemas/SmokeTestResult"
       required: [runAt, passed, failed, notConfigured, results]
+    MessagingChannel:
+      type: string
+      enum: [whatsapp, sms]
+    MessagingConnection:
+      type: object
+      properties:
+        id:
+          type: string
+        businessId:
+          type: string
+        userId:
+          type: string
+        channel:
+          $ref: "#/components/schemas/MessagingChannel"
+        phoneNumber:
+          type: string
+        label:
+          type: string
+          nullable: true
+        verified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        [id, businessId, userId, channel, phoneNumber, verified, createdAt, updatedAt]
+    CreateMessagingConnectionInput:
+      type: object
+      properties:
+        channel:
+          $ref: "#/components/schemas/MessagingChannel"
+        phoneNumber:
+          type: string
+          description: E.164 phone number, e.g. +14155551234
+        label:
+          type: string
+          nullable: true
+      required: [channel, phoneNumber]
+    VerifyMessagingConnectionInput:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 6-digit numeric verification code
+      required: [code]

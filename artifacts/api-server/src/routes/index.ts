@@ -10,6 +10,7 @@ import dashboardRouter from "./dashboard";
 import searchRouter from "./search";
 import assistantRouter from "./assistant";
 import configRouter from "./config";
+import messagingRouter from "./messaging";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use("/dashboard", dashboardRouter);
 router.use("/search", searchRouter);
 router.use("/assistant", assistantRouter);
 router.use("/config", configRouter);
+router.use("/messaging", messagingRouter);
 
 export default router;

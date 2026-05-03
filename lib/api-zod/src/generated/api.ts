@@ -27,6 +27,7 @@ export const GetStatusResponse = zod.object({
   messaging: zod.object({
     twilio: zod.enum(["ok", "configured", "not_configured", "error"]),
     whatsapp: zod.enum(["ok", "configured", "not_configured", "error"]),
+    sms: zod.enum(["ok", "configured", "not_configured", "error"]),
   }),
 });
 
@@ -551,6 +552,75 @@ export const GetPublicConfigResponse = zod.object({
     stripe: zod.enum(["configured", "not_configured"]),
     cal: zod.enum(["configured", "not_configured"]),
   }),
+});
+
+/**
+ * @summary List the current business's channel connections
+ */
+export const ListMessagingConnectionsResponseItem = zod.object({
+  id: zod.string(),
+  businessId: zod.string(),
+  userId: zod.string(),
+  channel: zod.enum(["whatsapp", "sms"]),
+  phoneNumber: zod.string(),
+  label: zod.string().nullish(),
+  verified: zod.boolean(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+export const ListMessagingConnectionsResponse = zod.array(
+  ListMessagingConnectionsResponseItem,
+);
+
+/**
+ * @summary Start a new WhatsApp/SMS channel connection (sends OTP)
+ */
+export const CreateMessagingConnectionBody = zod.object({
+  channel: zod.enum(["whatsapp", "sms"]),
+  phoneNumber: zod.string().describe("E.164 phone number, e.g. +14155551234"),
+  label: zod.string().nullish(),
+});
+
+export const CreateMessagingConnectionResponse = zod.object({
+  id: zod.string(),
+  businessId: zod.string(),
+  userId: zod.string(),
+  channel: zod.enum(["whatsapp", "sms"]),
+  phoneNumber: zod.string(),
+  label: zod.string().nullish(),
+  verified: zod.boolean(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Complete OTP verification for a channel connection
+ */
+export const VerifyMessagingConnectionParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const VerifyMessagingConnectionBody = zod.object({
+  code: zod.string().describe("6-digit numeric verification code"),
+});
+
+export const VerifyMessagingConnectionResponse = zod.object({
+  id: zod.string(),
+  businessId: zod.string(),
+  userId: zod.string(),
+  channel: zod.enum(["whatsapp", "sms"]),
+  phoneNumber: zod.string(),
+  label: zod.string().nullish(),
+  verified: zod.boolean(),
+  createdAt: zod.coerce.date(),
+  updatedAt: zod.coerce.date(),
+});
+
+/**
+ * @summary Disconnect (delete) a channel connection
+ */
+export const DeleteMessagingConnectionParams = zod.object({
+  id: zod.coerce.string(),
 });
 
 /**

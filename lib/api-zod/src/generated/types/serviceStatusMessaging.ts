@@ -10,4 +10,5 @@ import type { ServiceStatusValue } from "./serviceStatusValue";
 export type ServiceStatusMessaging = {
   twilio: ServiceStatusValue;
   whatsapp: ServiceStatusValue;
+  sms: ServiceStatusValue;
 };

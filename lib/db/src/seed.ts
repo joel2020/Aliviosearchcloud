@@ -67,9 +67,12 @@ async function main() {
       .values({
         id: "acc_demo_seed_web",
         businessId: business.id,
+        userId: business.ownerId,
         channel: "web",
+        phoneNumber: "+10000000000",
         label: "Website widget",
         isActive: true,
+        verified: true,
         config: { theme: "dark" },
       })
       .onConflictDoNothing({ target: assistantChannelConnectionsTable.id });
