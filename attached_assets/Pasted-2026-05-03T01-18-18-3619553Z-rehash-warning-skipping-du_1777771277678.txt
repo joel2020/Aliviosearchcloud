@@ -1,0 +1,86 @@
+2026-05-03T01:18:18.3619553Z rehash: warning: skipping duplicate certificate in azl_Sectigo_Public_Server_Authentication_Root_E46.pem
+2026-05-03T01:18:18.3620046Z rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_ECC_Root_CA_2022.pem
+2026-05-03T01:18:18.3620082Z rehash: warning: skipping duplicate certificate in azl_SSL.com_TLS_RSA_Root_CA_2022.pem
+2026-05-03T01:18:18.4403888Z rehash: warning: skipping duplicate certificate in azl_Sectigo_Public_Server_Authentication_Root_R46.pem
+2026-05-03T01:18:18.4816534Z 4 added, 0 removed; done.
+2026-05-03T01:18:18.5118521Z Running hooks in /etc/ca-certificates/update.d...
+2026-05-03T01:18:18.5481164Z done.
+2026-05-03T01:18:18.5812451Z CA certificates copied and updated successfully.
+2026-05-03T01:18:18.8072349Z Site's appCommandLine: uvicorn server:app --host 0.0.0.0 --port 8000
+2026-05-03T01:18:19.3812619Z Starting periodic command scheduler: cron.
+2026-05-03T01:18:19.3830055Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite -userStartupCommand 'uvicorn server:app --host 0.0.0.0 --port 8000'
+2026-05-03T01:18:19.8694273Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2026-05-03T01:18:19.8791417Z Build Operation ID: febf26534b130b25
+2026-05-03T01:18:19.880809Z Oryx Version: 0.2.20260130.1, Commit: a98e9aef5dfb6572a08b0a07ce414e1122ab4a2e, ReleaseTagName: 20260130.1
+2026-05-03T01:18:19.8813413Z Output is compressed. Extracting it...
+2026-05-03T01:18:19.8909041Z Found zstd-compressed tarball.
+2026-05-03T01:18:19.8909187Z Extracting '/home/site/wwwroot/output.tar.zst' to directory '/tmp/8dea8ae6d80407f'...
+2026-05-03T01:18:19.8909225Z Using zstd for decompression of file: /home/site/wwwroot/output.tar.zst
+2026-05-03T01:18:44.2990116Z zstd tar Successfully extracted '/home/site/wwwroot/output.tar.zst' to '/tmp/8dea8ae6d80407f'
+2026-05-03T01:18:44.2994249Z App path is set to '/tmp/8dea8ae6d80407f'
+2026-05-03T01:18:44.3538942Z Writing output script to '/opt/startup/startup.sh'
+2026-05-03T01:18:44.4793691Z Using packages from virtual environment antenv located at /tmp/8dea8ae6d80407f/antenv.
+2026-05-03T01:18:44.4800945Z Updated PYTHONPATH to '/opt/startup/app_logs:/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages'
+2026-05-03T01:18:50.910929Z 2026-05-03 01:18:50,909 INFO [alivio] Database provider: azure_documentdb · DB: alivio
+2026-05-03T01:18:51.3890077Z 2026-05-03 01:18:51,372 INFO [alivio] CORS allowed origins: ['https://aliviosearch.cloud', 'http://127.0.0.1:3000', 'https://www.aliviosearch.cloud', 'http://localhost:3000']
+2026-05-03T01:18:51.3891437Z INFO:     Started server process [1904]
+2026-05-03T01:18:51.3891484Z INFO:     Waiting for application startup.
+2026-05-03T01:18:51.460706Z ERROR:    Traceback (most recent call last):
+2026-05-03T01:18:51.4615649Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/starlette/routing.py", line 732, in lifespan
+2026-05-03T01:18:51.4615712Z     async with self.lifespan_context(app) as maybe_state:
+2026-05-03T01:18:51.4615743Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/starlette/routing.py", line 608, in __aenter__
+2026-05-03T01:18:51.4615768Z     await self._router.startup()
+2026-05-03T01:18:51.4615796Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/starlette/routing.py", line 709, in startup
+2026-05-03T01:18:51.461582Z     await handler()
+2026-05-03T01:18:51.4615846Z   File "/tmp/8dea8ae6d80407f/server.py", line 1044, in startup
+2026-05-03T01:18:51.461587Z     await ensure_indexes()
+2026-05-03T01:18:51.4615897Z   File "/tmp/8dea8ae6d80407f/server.py", line 69, in ensure_indexes
+2026-05-03T01:18:51.4615922Z     await db.users.create_index("email", unique=True)
+2026-05-03T01:18:51.4615949Z   File "/opt/python/3.11.14/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+2026-05-03T01:18:51.4615994Z     result = self.fn(*self.args, **self.kwargs)
+2026-05-03T01:18:51.4616024Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616052Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/collection.py", line 2138, in create_index
+2026-05-03T01:18:51.4616077Z     return self.__create_indexes([index], session, **cmd_options)[0]
+2026-05-03T01:18:51.4616103Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.461613Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/_csot.py", line 108, in csot_wrapper
+2026-05-03T01:18:51.4616155Z     return func(self, *args, **kwargs)
+2026-05-03T01:18:51.4616179Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616207Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/collection.py", line 1990, in __create_indexes
+2026-05-03T01:18:51.4616232Z     with self._conn_for_writes(session) as conn:
+2026-05-03T01:18:51.4616277Z   File "/opt/python/3.11.14/lib/python3.11/contextlib.py", line 137, in __enter__
+2026-05-03T01:18:51.4616301Z     return next(self.gen)
+2026-05-03T01:18:51.4616324Z            ^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616352Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/mongo_client.py", line 1246, in _checkout
+2026-05-03T01:18:51.4616378Z     with server.checkout(handler=err_handler) as conn:
+2026-05-03T01:18:51.4616404Z   File "/opt/python/3.11.14/lib/python3.11/contextlib.py", line 137, in __enter__
+2026-05-03T01:18:51.4616427Z     return next(self.gen)
+2026-05-03T01:18:51.461645Z            ^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616478Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 1598, in checkout
+2026-05-03T01:18:51.4616502Z     conn = self._get_conn(handler=handler)
+2026-05-03T01:18:51.4616527Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616572Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 1714, in _get_conn
+2026-05-03T01:18:51.4616598Z     conn = self.connect(handler=handler)
+2026-05-03T01:18:51.4616622Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616649Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 1568, in connect
+2026-05-03T01:18:51.4616673Z     conn.authenticate()
+2026-05-03T01:18:51.46167Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 1042, in authenticate
+2026-05-03T01:18:51.4616726Z     auth.authenticate(creds, self, reauthenticate=reauthenticate)
+2026-05-03T01:18:51.4616753Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/auth.py", line 616, in authenticate
+2026-05-03T01:18:51.4616777Z     auth_func(credentials, conn)
+2026-05-03T01:18:51.4616804Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/auth.py", line 289, in _authenticate_scram
+2026-05-03T01:18:51.4616849Z     res = conn.command(source, cmd)
+2026-05-03T01:18:51.4616874Z           ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616901Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/helpers.py", line 315, in inner
+2026-05-03T01:18:51.4616925Z     return func(*args, **kwargs)
+2026-05-03T01:18:51.4616949Z            ^^^^^^^^^^^^^^^^^^^^^
+2026-05-03T01:18:51.4616976Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/pool.py", line 932, in command
+2026-05-03T01:18:51.4616999Z     return command(
+2026-05-03T01:18:51.4617023Z            ^^^^^^^^
+2026-05-03T01:18:51.461705Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/network.py", line 191, in command
+2026-05-03T01:18:51.4617074Z     helpers._check_command_response(
+2026-05-03T01:18:51.4617102Z   File "/tmp/8dea8ae6d80407f/antenv/lib/python3.11/site-packages/pymongo/helpers.py", line 223, in _check_command_response
+2026-05-03T01:18:51.4617145Z     raise OperationFailure(errmsg, code, response, max_wire_version)
+2026-05-03T01:18:51.4617175Z pymongo.errors.OperationFailure: Invalid key, full error: {'ok': 0.0, 'code': 18, 'codeName': 'AuthenticationFailed', 'errmsg': 'Invalid key'}
+2026-05-03T01:18:51.4617198Z
+2026-05-03T01:18:51.4694789Z ERROR:    Application startup failed. Exiting.
+2026-05-03T01:20:13.850Z No new trace in the past 1 min(s).
