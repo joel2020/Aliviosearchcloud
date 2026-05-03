@@ -25,10 +25,10 @@ function consumeRateToken(ip: string): boolean {
 
 router.post("/submit", async (req, res, next) => {
   try {
-    const ip =
-      req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.ip ||
-      "unknown";
+    // Use req.ip (Express resolves it from the trusted proxy hop set in
+    // app.ts via `trust proxy`). Never read x-forwarded-for directly — it's
+    // spoofable.
+    const ip = req.ip || "unknown";
     if (!consumeRateToken(ip)) {
       res
         .status(429)
