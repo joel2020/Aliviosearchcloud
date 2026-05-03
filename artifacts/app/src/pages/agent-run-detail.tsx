@@ -20,7 +20,13 @@ export default function AgentRunDetailPage({
 }: AgentRunDetailPageProps) {
   const { id, runId } = params;
   const { data: agent } = useGetAgent(id);
-  const { data: run, isLoading, isError, error } = useGetAgentRun(runId);
+  const {
+    data: run,
+    isLoading,
+    isError,
+    error,
+    refetch: refetchRun,
+  } = useGetAgentRun(runId);
 
   // Guard: route id must match the run's actual agent. Otherwise the page
   // would render misleading breadcrumb / icon / metadata.
@@ -56,10 +62,22 @@ export default function AgentRunDetailPage({
           </Button>
         </Link>
         <Card className="border-destructive/30 bg-destructive/10">
-          <CardContent className="py-6 text-sm text-destructive">
-            {status === 404
-              ? `Run ${runId} not found in this workspace.`
-              : `Could not load run: ${error instanceof Error ? error.message : "Unknown error"}.`}
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4 text-sm text-destructive">
+            <span>
+              {status === 404
+                ? `Run ${runId} not found in this workspace.`
+                : `Could not load run: ${error instanceof Error ? error.message : "Unknown error"}.`}
+            </span>
+            {status === 404 ? null : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => refetchRun()}
+                data-testid="button-retry-run"
+              >
+                Retry
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>

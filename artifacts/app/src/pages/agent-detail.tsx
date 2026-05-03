@@ -32,6 +32,7 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
     isLoading: agentLoading,
     isError,
     error,
+    refetch: refetchAgent,
   } = useGetAgent(id);
   const { data: runs, isLoading: runsLoading } = useListAgentRuns({
     limit: 10,
@@ -72,10 +73,22 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
           </Button>
         </Link>
         <Card className="border-destructive/30 bg-destructive/10">
-          <CardContent className="py-6 text-sm text-destructive">
-            {status === 404
-              ? `No agent with id "${id}".`
-              : `Could not load agent: ${error instanceof Error ? error.message : "Unknown error"}.`}
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4 text-sm text-destructive">
+            <span>
+              {status === 404
+                ? `No agent with id "${id}".`
+                : `Could not load agent: ${error instanceof Error ? error.message : "Unknown error"}.`}
+            </span>
+            {status === 404 ? null : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => refetchAgent()}
+                data-testid="button-retry-agent"
+              >
+                Retry
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>

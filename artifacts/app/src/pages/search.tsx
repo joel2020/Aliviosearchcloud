@@ -35,7 +35,7 @@ export default function SearchPage() {
   const debounced = useDebounced(q.trim(), 250);
   const { recents, record, clear } = useRecentSearches();
 
-  const { data, isFetching } = useQuery({
+  const { data, isFetching, isError, error, refetch } = useQuery({
     ...getSearchWorkspaceQueryOptions({ q: debounced || "_" }),
     enabled: debounced.length > 0,
   });
@@ -78,6 +78,23 @@ export default function SearchPage() {
           onPick={(value) => setQ(value)}
           onClear={clear}
         />
+      ) : isError ? (
+        <Card className="border-destructive/30 bg-destructive/10">
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4 text-sm text-destructive">
+            <span>
+              Search failed:{" "}
+              {error instanceof Error ? error.message : "Unknown error"}.
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => refetch()}
+              data-testid="button-retry-search"
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
       ) : isFetching && !data ? (
         <ResultSkeleton />
       ) : data ? (

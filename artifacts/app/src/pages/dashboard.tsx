@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { Section } from "@/components/shell/Section";
-import { agentMeta, formatRelative, statusTone } from "@/lib/agentMeta";
+import { agentMeta, agentName, formatRelative, statusTone } from "@/lib/agentMeta";
 
 const QUICK_LAUNCH = [
   { id: "revenue-leak", title: "Find revenue leaks", blurb: "Audit your funnel for missed money." },
@@ -231,7 +231,7 @@ export default function DashboardPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="truncate text-sm font-medium">
-                                {r.agentSlug}
+                                {agentName(r.agentSlug)}
                               </span>
                               <Badge variant="outline" className={tone.className}>
                                 {tone.label}

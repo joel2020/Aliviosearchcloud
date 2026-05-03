@@ -32,8 +32,27 @@ const META: Record<string, { icon: LucideIcon; accent: string }> = {
 
 const FALLBACK = { icon: Bot, accent: "text-muted-foreground" };
 
+const NAMES: Record<string, string> = {
+  "revenue-leak": "Revenue Leak Finder",
+  "missed-call": "Missed Call Responder",
+  "instant-response": "Instant Lead Response",
+  "follow-up": "Follow-Up Sequencer",
+  reactivation: "Reactivation Campaign",
+  "outbound-sales": "Outbound Sales Strategist",
+  "linkedin-outreach": "LinkedIn Outreach",
+  "cold-email": "Cold Email Writer",
+  "lead-research": "Lead Research",
+  proposal: "Proposal Generator",
+  "seo-content": "SEO Content Brief",
+  "business-assistant": "Business Assistant",
+};
+
 export function agentMeta(slug: string) {
   return META[slug] ?? FALLBACK;
+}
+
+export function agentName(slug: string): string {
+  return NAMES[slug] ?? slug;
 }
 
 export function statusTone(status: string): {
