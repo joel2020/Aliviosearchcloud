@@ -237,6 +237,23 @@ router.post(
     const agent = agentRegistry.get("business-assistant");
     let reply = "Sorry — the assistant isn't available right now. Please try again shortly.";
     if (agent) {
+      // Load the last few messages in this WhatsApp/SMS conversation so the
+      // assistant can answer with continuity, matching the in-app chat UX.
+      const recentMsgRows = await db
+        .select()
+        .from(assistantMessagesTable)
+        .where(eq(assistantMessagesTable.conversationId, conv.id))
+        .orderBy(desc(assistantMessagesTable.createdAt))
+        .limit(11); // 10 prior + the inbound we just stored
+      const history = recentMsgRows
+        .reverse()
+        .filter((m) => m.id) // safety
+        .slice(0, -1) // drop the just-inserted inbound, the runner gets it via `message`
+        .map((m) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        }));
+
       const recentRunRows = await db
         .select()
         .from(agentRunsTable)
@@ -279,7 +296,7 @@ router.post(
           agent,
           rawInput: {
             message: messageBody,
-            history: [],
+            history,
             mode: "general",
             recentRuns,
           },
