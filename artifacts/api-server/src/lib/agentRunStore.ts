@@ -41,7 +41,7 @@ export async function persistAgentRun(
       agentSlug: args.agentSlug,
       status: args.status,
       input: args.input,
-      output: args.output ?? {},
+      output: args.output === undefined ? {} : args.output,
       errorMessage: args.errorMessage ?? null,
       tokensUsed: args.tokensUsed ?? 0,
       startedAt: now,

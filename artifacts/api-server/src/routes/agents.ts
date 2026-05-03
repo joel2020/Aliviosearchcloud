@@ -48,6 +48,14 @@ router.post("/:id/run", requireAuth, async (req, res, next) => {
       business,
       log: req.log,
     });
+    if (run.status === "invalid_input") {
+      res.status(400).json({
+        error: "invalid_input",
+        message: run.errorMessage ?? "Input failed agent schema validation.",
+        run: serializeAgentRun(run),
+      });
+      return;
+    }
     res.json(serializeAgentRun(run));
   } catch (err) {
     next(err);

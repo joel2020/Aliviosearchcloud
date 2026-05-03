@@ -69,6 +69,7 @@ export async function executeAgentRun(
           agentSlug: agent.id,
           status: "not_configured",
           input: inputJson,
+          output: null,
           errorMessage: err.message,
         });
         const latencyMs = Date.now() - startedAt;
@@ -123,13 +124,18 @@ export async function executeAgentRun(
     return { run: persisted, latencyMs, tokensUsed: result.tokensUsed };
   }
 
+  const detailedMessage =
+    result.status === "invalid_input" && result.issues?.length
+      ? `${result.errorMessage} (${result.issues.join("; ")})`
+      : result.errorMessage;
   const persisted = await persistAgentRun({
     businessId: business.id,
     userId: user.id,
     agentSlug: agent.id,
     status: result.status,
     input: inputJson,
-    errorMessage: result.errorMessage,
+    output: null,
+    errorMessage: detailedMessage,
   });
   log.warn(
     {
