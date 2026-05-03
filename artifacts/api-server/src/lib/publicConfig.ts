@@ -2,8 +2,11 @@
  * Single source of truth for the public Stripe + Cal.com config.
  *
  * SECURITY CONTRACT:
- *  - STRIPE_SECRET_KEY is read here ONLY to report `status.stripe`. It is
- *    never returned in any payload. The presence flag below is a boolean.
+ *  - This module reads ONLY the public-link env vars
+ *    (STRIPE_PAYMENT_LINK_AUDIT, STRIPE_PAYMENT_LINK_ENGINE, CAL_LINK,
+ *    VITE_CAL_LINK). STRIPE_SECRET_KEY is intentionally NOT read here and
+ *    never reaches any response payload — it is reserved for future
+ *    server-side webhook handlers.
  *  - This module must NEVER be imported from frontend code, and the object
  *    returned by `getPublicConfig()` must NEVER include any secret values.
  *    The runtime assertion at the bottom guards this contract.
@@ -55,15 +58,6 @@ export function getPublicConfig(): PublicConfig {
       cal: calConfigured ? "configured" : "not_configured",
     },
   };
-}
-
-/**
- * Reports whether the server has STRIPE_SECRET_KEY (used for future webhooks).
- * Does NOT return the key itself.
- */
-export function hasStripeSecretKey(): boolean {
-  const v = process.env["STRIPE_SECRET_KEY"];
-  return Boolean(v && v.trim());
 }
 
 // Runtime contract: the public config payload must never contain a string that
