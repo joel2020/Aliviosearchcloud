@@ -6,6 +6,7 @@ import { useSeo } from "@/marketing/lib/useSeo";
 import { CTAButton } from "@/components/CTAButton";
 import { Badge } from "@/components/ui/badge";
 import { BlogMarkdown } from "@/marketing/blog/BlogMarkdown";
+import { NewsletterSignup } from "../components/NewsletterSignup";
 import {
   getPostBySlug,
   getSiblingPosts,
@@ -220,6 +221,18 @@ export default function BlogPostPage({
           <BlogMarkdown>{post.body}</BlogMarkdown>
         </div>
       </article>
+      <section
+        className="border-t border-border/40 px-6 py-16"
+        aria-labelledby="post-newsletter-heading"
+      >
+        <h2 id="post-newsletter-heading" className="sr-only">
+          Subscribe to the Revenue Engine newsletter
+        </h2>
+        <NewsletterSignup
+          source="blog-post-footer"
+          testIdPrefix="newsletter-post-footer"
+        />
+      </section>
       <SiblingPosts siblings={siblings} />
       <FooterCta />
     </MarketingLayout>

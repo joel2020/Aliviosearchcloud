@@ -378,6 +378,26 @@ export interface CreateMessagingConnectionInput {
   label?: string | null;
 }
 
+export interface BlogSubscribeInput {
+  /**
+   * @minLength 3
+   * @maxLength 254
+   */
+  email: string;
+  /**
+   * Where the form was submitted from, used for attribution.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9][a-z0-9-]{0,63}$
+   */
+  source: string;
+}
+
+export interface BlogSubscribeResponse {
+  ok: boolean;
+  alreadySubscribed: boolean;
+}
+
 export interface VerifyMessagingConnectionInput {
   /**
    * 6-digit numeric verification code

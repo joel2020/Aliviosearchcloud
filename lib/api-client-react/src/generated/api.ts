@@ -23,6 +23,8 @@ import type {
   AssistantConversation,
   AssistantConversationWithMessages,
   AssistantMessagePairResponse,
+  BlogSubscribeInput,
+  BlogSubscribeResponse,
   Business,
   CreateAssistantConversationInput,
   CreateMessagingConnectionInput,
@@ -1927,6 +1929,97 @@ export const useDeleteMessagingConnection = <
   TContext
 > => {
   return useMutation(getDeleteMessagingConnectionMutationOptions(options));
+};
+
+/**
+ * Public endpoint. Captures an email address with the originating
+surface (e.g. `blog-post-footer`, `blog-index`, `home-blog-preview`)
+for attribution. Idempotent: re-subscribing an existing email returns
+success without creating a duplicate.
+
+ * @summary Subscribe an email address to the blog newsletter
+ */
+export const getSubscribeToBlogUrl = () => {
+  return `/api/blog/subscribe`;
+};
+
+export const subscribeToBlog = async (
+  blogSubscribeInput: BlogSubscribeInput,
+  options?: RequestInit,
+): Promise<BlogSubscribeResponse> => {
+  return customFetch<BlogSubscribeResponse>(getSubscribeToBlogUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(blogSubscribeInput),
+  });
+};
+
+export const getSubscribeToBlogMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof subscribeToBlog>>,
+    TError,
+    { data: BodyType<BlogSubscribeInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof subscribeToBlog>>,
+  TError,
+  { data: BodyType<BlogSubscribeInput> },
+  TContext
+> => {
+  const mutationKey = ["subscribeToBlog"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof subscribeToBlog>>,
+    { data: BodyType<BlogSubscribeInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return subscribeToBlog(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubscribeToBlogMutationResult = NonNullable<
+  Awaited<ReturnType<typeof subscribeToBlog>>
+>;
+export type SubscribeToBlogMutationBody = BodyType<BlogSubscribeInput>;
+export type SubscribeToBlogMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Subscribe an email address to the blog newsletter
+ */
+export const useSubscribeToBlog = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof subscribeToBlog>>,
+    TError,
+    { data: BodyType<BlogSubscribeInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof subscribeToBlog>>,
+  TError,
+  { data: BodyType<BlogSubscribeInput> },
+  TContext
+> => {
+  return useMutation(getSubscribeToBlogMutationOptions(options));
 };
 
 /**

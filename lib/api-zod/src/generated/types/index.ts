@@ -22,6 +22,8 @@ export * from "./assistantMessage";
 export * from "./assistantMessageMetadata";
 export * from "./assistantMessagePairResponse";
 export * from "./assistantMessageRole";
+export * from "./blogSubscribeInput";
+export * from "./blogSubscribeResponse";
 export * from "./business";
 export * from "./createAssistantConversationInput";
 export * from "./createMessagingConnectionInput";

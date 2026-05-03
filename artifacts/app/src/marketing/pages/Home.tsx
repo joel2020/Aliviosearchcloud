@@ -1,14 +1,13 @@
 import { MarketingLayout } from "../components/MarketingLayout";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight, Bot, Target, Zap, CheckCircle2, ShieldCheck, Mail } from "lucide-react";
+import { ArrowRight, Bot, Target, Zap, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CTAButton } from "@/components/CTAButton";
 import { useSeo } from "@/marketing/lib/useSeo";
-import { CTA_AUDIT } from "@/marketing/lib/ctas";
 import { MARKETING_AGENTS } from "@/marketing/lib/agents";
 import { MARKETING_BLOG_POSTS, latestPosts } from "@/marketing/lib/blogPosts";
-import { Input } from "@/components/ui/input";
+import { NewsletterSignup } from "../components/NewsletterSignup";
 
 export default function Home() {
   useSeo({
@@ -263,15 +262,12 @@ export default function Home() {
           </div>
 
           {(!MARKETING_BLOG_POSTS || MARKETING_BLOG_POSTS.length === 0) ? (
-            <div className="max-w-xl mx-auto text-center rounded-2xl border border-border bg-background p-10">
-              <Mail className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">New revenue playbooks landing soon.</h3>
-              <p className="text-muted-foreground mb-6">Subscribe to be the first to read them.</p>
-              <form className="flex gap-2 max-w-md mx-auto" onSubmit={(e) => { e.preventDefault(); window.location.href = CTA_AUDIT.href; }}>
-                <Input type="email" placeholder="hello@yourbusiness.com" className="flex-1" />
-                <Button type="submit">Subscribe</Button>
-              </form>
-            </div>
+            <NewsletterSignup
+              source="home-blog-preview"
+              testIdPrefix="newsletter-home"
+              heading="New revenue playbooks landing soon"
+              description="Subscribe to be the first to read them."
+            />
           ) : (
             <>
               <div className="grid md:grid-cols-3 gap-8">

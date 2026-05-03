@@ -32,6 +32,8 @@ tags:
     description: Public runtime configuration
   - name: messaging
     description: Twilio WhatsApp/SMS channel connections and inbound webhook
+  - name: blog
+    description: Public blog endpoints (newsletter signup)
 paths:
   /healthz:
     get:
@@ -627,6 +629,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /blog/subscribe:
+    post:
+      operationId: subscribeToBlog
+      tags: [blog]
+      summary: Subscribe an email address to the blog newsletter
+      description: |
+        Public endpoint. Captures an email address with the originating
+        surface (e.g. `blog-post-footer`, `blog-index`, `home-blog-preview`)
+        for attribution. Idempotent: re-subscribing an existing email returns
+        success without creating a duplicate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogSubscribeInput"
+      responses:
+        "200":
+          description: Subscribed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogSubscribeResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /admin/agents/smoke-test:
     post:
       operationId: smokeTestAgents
@@ -1214,6 +1251,29 @@ components:
           type: string
           nullable: true
       required: [channel, phoneNumber]
+    BlogSubscribeInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 254
+        source:
+          type: string
+          description: Where the form was submitted from, used for attribution.
+          minLength: 1
+          maxLength: 64
+          pattern: "^[a-z0-9][a-z0-9-]{0,63}$"
+      required: [email, source]
+    BlogSubscribeResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        alreadySubscribed:
+          type: boolean
+      required: [ok, alreadySubscribed]
     VerifyMessagingConnectionInput:
       type: object
       properties:

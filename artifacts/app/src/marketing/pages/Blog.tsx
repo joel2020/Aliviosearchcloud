@@ -11,6 +11,7 @@ import {
   getAllCategories,
 } from "@/marketing/blog/loader";
 import type { BlogPost } from "@/marketing/blog/types";
+import { NewsletterSignup } from "../components/NewsletterSignup";
 
 const ALL_CATEGORIES = "All";
 
@@ -171,6 +172,22 @@ export default function Blog() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* Newsletter signup */}
+      <section
+        className="border-t border-border/40 px-6 py-16"
+        aria-labelledby="blog-newsletter-heading"
+      >
+        <h2 id="blog-newsletter-heading" className="sr-only">
+          Subscribe to the Revenue Engine newsletter
+        </h2>
+        <NewsletterSignup
+          source="blog-index"
+          testIdPrefix="newsletter-blog-index"
+          heading="Don't miss the next playbook"
+          description="Join operators getting weekly tactics on missed-call recovery, lead follow-up, and AI revenue agents."
+        />
       </section>
 
       {/* Bottom CTA */}

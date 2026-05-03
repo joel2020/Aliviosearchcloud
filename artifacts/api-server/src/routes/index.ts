@@ -11,6 +11,7 @@ import searchRouter from "./search";
 import assistantRouter from "./assistant";
 import configRouter from "./config";
 import messagingRouter from "./messaging";
+import blogRouter from "./blog";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use("/search", searchRouter);
 router.use("/assistant", assistantRouter);
 router.use("/config", configRouter);
 router.use("/messaging", messagingRouter);
+router.use("/blog", blogRouter);
 
 export default router;

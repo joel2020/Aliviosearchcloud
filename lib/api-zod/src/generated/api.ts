@@ -634,6 +634,42 @@ export const DeleteMessagingConnectionParams = zod.object({
 });
 
 /**
+ * Public endpoint. Captures an email address with the originating
+surface (e.g. `blog-post-footer`, `blog-index`, `home-blog-preview`)
+for attribution. Idempotent: re-subscribing an existing email returns
+success without creating a duplicate.
+
+ * @summary Subscribe an email address to the blog newsletter
+ */
+export const subscribeToBlogBodyEmailMin = 3;
+export const subscribeToBlogBodyEmailMax = 254;
+
+export const subscribeToBlogBodySourceMax = 64;
+
+export const subscribeToBlogBodySourceRegExp = new RegExp(
+  "^[a-z0-9][a-z0-9-]{0,63}$",
+);
+
+export const SubscribeToBlogBody = zod.object({
+  email: zod
+    .string()
+    .email()
+    .min(subscribeToBlogBodyEmailMin)
+    .max(subscribeToBlogBodyEmailMax),
+  source: zod
+    .string()
+    .min(1)
+    .max(subscribeToBlogBodySourceMax)
+    .regex(subscribeToBlogBodySourceRegExp)
+    .describe("Where the form was submitted from, used for attribution."),
+});
+
+export const SubscribeToBlogResponse = zod.object({
+  ok: zod.boolean(),
+  alreadySubscribed: zod.boolean(),
+});
+
+/**
  * @summary Smoke-test every agent (admin only)
  */
 export const SmokeTestAgentsResponse = zod.object({
