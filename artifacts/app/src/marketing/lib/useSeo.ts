@@ -56,11 +56,17 @@ export function useSeo({ title, description, path, ogImage }: SeoOptions): void 
     const cleanBase = basePath || "";
     const fullPath = `${cleanBase}${path}`.replace(/\/+$/, "") || "/";
     const canonical = origin ? `${origin}${fullPath}` : fullPath;
-    const og = ogImage
-      ? ogImage
+    // Always emit absolute OG image URLs — some social crawlers
+    // (notably older Facebook/LinkedIn fetchers) refuse to resolve
+    // relative paths.
+    const rawOg = ogImage ?? "/opengraph.jpg";
+    const isAbsolute = /^https?:\/\//i.test(rawOg);
+    const ogPath = rawOg.startsWith("/") ? rawOg : `/${rawOg}`;
+    const og = isAbsolute
+      ? rawOg
       : origin
-      ? `${origin}${cleanBase}/opengraph.jpg`
-      : `${cleanBase}/opengraph.jpg`;
+      ? `${origin}${cleanBase}${ogPath}`
+      : `${cleanBase}${ogPath}`;
 
     const fullTitle = `${title} · ${SITE_NAME}`;
     document.title = fullTitle;
