@@ -437,14 +437,29 @@ export const DeleteAssistantConversationParams = zod.object({
 
 /**
  * Persists the user message, runs the Business Assistant agent against
-full business context, persists the assistant reply, and returns the
-updated message pair. SSE streaming may be added behind the same path
-in a future revision; this JSON variant is the always-supported fallback.
+full business context (business profile + recent agent runs +
+conversation history), persists the assistant reply, and returns the
+updated message pair.
+
+When `?stream=1` is passed, the endpoint responds with a
+`text/event-stream` SSE body that emits the following events:
+  - `user_message` — the persisted user row
+  - `chunk` — `{ delta: string }` for each token
+  - `assistant_message` — the persisted assistant row
+  - `done` — `{ conversation, suggestedActions }`
+  - `error` — `{ error, message }` (e.g. `assistant_not_configured`)
 
  * @summary Send a user message and get the assistant reply
  */
 export const PostAssistantMessageParams = zod.object({
   id: zod.coerce.string(),
+});
+
+export const PostAssistantMessageQueryParams = zod.object({
+  stream: zod
+    .enum(["1"])
+    .optional()
+    .describe("When set to `1`, response is a `text\/event-stream` SSE body."),
 });
 
 export const postAssistantMessageBodyContentMax = 4000;

@@ -26,6 +26,17 @@ const inputSchema = z.object({
     ])
     .optional()
     .default("general"),
+  recentRuns: z
+    .array(
+      z.object({
+        agentSlug: z.string(),
+        status: z.string(),
+        completedAt: z.string().nullable().optional(),
+        summary: z.string().optional(),
+      }),
+    )
+    .optional()
+    .default([]),
 });
 
 const outputSchema = z.object({
@@ -48,6 +59,18 @@ export const businessAssistantAgent = defineAgent({
       businessContextBlock(ctx),
       "",
       `Assistant mode: ${input.mode ?? "general"}`,
+      "Recent agent activity (most recent first):",
+      (input.recentRuns ?? []).length === 0
+        ? "(none)"
+        : (input.recentRuns ?? [])
+            .map(
+              (r) =>
+                `- ${r.agentSlug} [${r.status}]${
+                  r.completedAt ? ` @ ${r.completedAt}` : ""
+                }${r.summary ? ` — ${r.summary}` : ""}`,
+            )
+            .join("\n"),
+      "",
       "Conversation so far:",
       (input.history ?? [])
         .map((m) => `[${m.role}] ${m.content}`)

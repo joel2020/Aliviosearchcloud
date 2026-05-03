@@ -32,6 +32,8 @@ export * from "./errorResponse";
 export * from "./healthStatus";
 export * from "./listAgentRunsParams";
 export * from "./postAssistantMessageInput";
+export * from "./postAssistantMessageParams";
+export * from "./postAssistantMessageStream";
 export * from "./runAgentRequest";
 export * from "./runAgentRequestInput";
 export * from "./searchAgentHit";

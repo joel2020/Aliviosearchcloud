@@ -31,6 +31,7 @@ import type {
   HealthStatus,
   ListAgentRunsParams,
   PostAssistantMessageInput,
+  PostAssistantMessageParams,
   RunAgentRequest,
   SearchResults,
   SearchWorkspaceParams,
@@ -1371,23 +1372,47 @@ export const useDeleteAssistantConversation = <
 
 /**
  * Persists the user message, runs the Business Assistant agent against
-full business context, persists the assistant reply, and returns the
-updated message pair. SSE streaming may be added behind the same path
-in a future revision; this JSON variant is the always-supported fallback.
+full business context (business profile + recent agent runs +
+conversation history), persists the assistant reply, and returns the
+updated message pair.
+
+When `?stream=1` is passed, the endpoint responds with a
+`text/event-stream` SSE body that emits the following events:
+  - `user_message` — the persisted user row
+  - `chunk` — `{ delta: string }` for each token
+  - `assistant_message` — the persisted assistant row
+  - `done` — `{ conversation, suggestedActions }`
+  - `error` — `{ error, message }` (e.g. `assistant_not_configured`)
 
  * @summary Send a user message and get the assistant reply
  */
-export const getPostAssistantMessageUrl = (id: string) => {
-  return `/api/assistant/conversations/${id}/messages`;
+export const getPostAssistantMessageUrl = (
+  id: string,
+  params?: PostAssistantMessageParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/assistant/conversations/${id}/messages?${stringifiedParams}`
+    : `/api/assistant/conversations/${id}/messages`;
 };
 
 export const postAssistantMessage = async (
   id: string,
   postAssistantMessageInput: PostAssistantMessageInput,
+  params?: PostAssistantMessageParams,
   options?: RequestInit,
 ): Promise<AssistantMessagePairResponse> => {
   return customFetch<AssistantMessagePairResponse>(
-    getPostAssistantMessageUrl(id),
+    getPostAssistantMessageUrl(id, params),
     {
       ...options,
       method: "POST",
@@ -1404,14 +1429,22 @@ export const getPostAssistantMessageMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAssistantMessage>>,
     TError,
-    { id: string; data: BodyType<PostAssistantMessageInput> },
+    {
+      id: string;
+      data: BodyType<PostAssistantMessageInput>;
+      params?: PostAssistantMessageParams;
+    },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof postAssistantMessage>>,
   TError,
-  { id: string; data: BodyType<PostAssistantMessageInput> },
+  {
+    id: string;
+    data: BodyType<PostAssistantMessageInput>;
+    params?: PostAssistantMessageParams;
+  },
   TContext
 > => {
   const mutationKey = ["postAssistantMessage"];
@@ -1425,11 +1458,15 @@ export const getPostAssistantMessageMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof postAssistantMessage>>,
-    { id: string; data: BodyType<PostAssistantMessageInput> }
+    {
+      id: string;
+      data: BodyType<PostAssistantMessageInput>;
+      params?: PostAssistantMessageParams;
+    }
   > = (props) => {
-    const { id, data } = props ?? {};
+    const { id, data, params } = props ?? {};
 
-    return postAssistantMessage(id, data, requestOptions);
+    return postAssistantMessage(id, data, params, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1452,14 +1489,22 @@ export const usePostAssistantMessage = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof postAssistantMessage>>,
     TError,
-    { id: string; data: BodyType<PostAssistantMessageInput> },
+    {
+      id: string;
+      data: BodyType<PostAssistantMessageInput>;
+      params?: PostAssistantMessageParams;
+    },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof postAssistantMessage>>,
   TError,
-  { id: string; data: BodyType<PostAssistantMessageInput> },
+  {
+    id: string;
+    data: BodyType<PostAssistantMessageInput>;
+    params?: PostAssistantMessageParams;
+  },
   TContext
 > => {
   return useMutation(getPostAssistantMessageMutationOptions(options));

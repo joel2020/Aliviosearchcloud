@@ -19,6 +19,8 @@ import {
   Loader2,
   AlertTriangle,
   Check,
+  Paperclip,
+  KeyRound,
 } from "lucide-react";
 import {
   useListAssistantConversations,
@@ -255,6 +257,108 @@ function StreamingBubble({ visible }: { visible: boolean }) {
   );
 }
 
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+interface SseHandlers {
+  onUserMessage?: (m: AssistantMessage) => void;
+  onChunk: (delta: string) => void;
+  onAssistantMessage?: (m: AssistantMessage) => void;
+  onError: (err: { error: string; message: string }) => void;
+  onDone: () => void;
+}
+
+async function streamAssistantMessage(
+  conversationId: string,
+  body: { content: string; agentMode: AgentMode; regenerate?: boolean },
+  handlers: SseHandlers,
+): Promise<void> {
+  const url = `${basePath}/api/assistant/conversations/${encodeURIComponent(
+    conversationId,
+  )}/messages?stream=1`;
+  const res = await fetch(url, {
+    method: "POST",
+    credentials: "include",
+    headers: { "content-type": "application/json", accept: "text/event-stream" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok || !res.body) {
+    let parsed: { error?: string; message?: string } = {};
+    try {
+      parsed = await res.json();
+    } catch {
+      // ignore
+    }
+    handlers.onError({
+      error: parsed.error ?? "request_failed",
+      message:
+        parsed.message ??
+        (res.status === 503
+          ? "Assistant not configured."
+          : `Request failed (${res.status})`),
+    });
+    return;
+  }
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let currentEvent = "message";
+  let dataLines: string[] = [];
+
+  const flush = () => {
+    if (dataLines.length === 0) {
+      currentEvent = "message";
+      return;
+    }
+    const raw = dataLines.join("\n");
+    dataLines = [];
+    let payload: unknown = raw;
+    try {
+      payload = JSON.parse(raw);
+    } catch {
+      // keep raw
+    }
+    switch (currentEvent) {
+      case "user_message":
+        handlers.onUserMessage?.(payload as AssistantMessage);
+        break;
+      case "chunk": {
+        const delta = (payload as { delta?: string })?.delta ?? "";
+        if (delta) handlers.onChunk(delta);
+        break;
+      }
+      case "assistant_message":
+        handlers.onAssistantMessage?.(payload as AssistantMessage);
+        break;
+      case "done":
+        handlers.onDone();
+        break;
+      case "error":
+        handlers.onError(payload as { error: string; message: string });
+        break;
+    }
+    currentEvent = "message";
+  };
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    let nlIdx;
+    while ((nlIdx = buf.indexOf("\n")) !== -1) {
+      const line = buf.slice(0, nlIdx).replace(/\r$/, "");
+      buf = buf.slice(nlIdx + 1);
+      if (line === "") {
+        flush();
+      } else if (line.startsWith("event:")) {
+        currentEvent = line.slice(6).trim();
+      } else if (line.startsWith("data:")) {
+        dataLines.push(line.slice(5).replace(/^ /, ""));
+      }
+    }
+  }
+  if (dataLines.length > 0) flush();
+}
+
 export default function AssistantPage() {
   const qc = useQueryClient();
   const { toast } = useToast();
@@ -262,6 +366,12 @@ export default function AssistantPage() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<AgentMode>("general");
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+  const [streamingText, setStreamingText] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [optimisticUser, setOptimisticUser] = useState<AssistantMessage | null>(
+    null,
+  );
+  const [notConfigured, setNotConfigured] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const conversationsQuery = useListAssistantConversations({
@@ -296,7 +406,7 @@ export default function AssistantPage() {
   const deleteConversation = useDeleteAssistantConversation();
   const postMessage = usePostAssistantMessage();
 
-  const isSending = postMessage.isPending;
+  const isSending = postMessage.isPending || isStreaming;
 
   function invalidate() {
     qc.invalidateQueries();
@@ -319,18 +429,36 @@ export default function AssistantPage() {
     return created.id;
   }
 
-  async function handleSend(content: string) {
-    const trimmed = content.trim();
-    if (!trimmed || isSending) return;
+  async function runStream(
+    conversationId: string,
+    body: { content: string; agentMode: AgentMode; regenerate?: boolean },
+  ) {
+    setIsStreaming(true);
+    setStreamingText("");
+    let errored = false;
     try {
-      const id = await ensureConversationId();
-      setInput("");
-      await postMessage.mutateAsync({
-        id,
-        data: { content: trimmed, agentMode: mode },
+      await streamAssistantMessage(conversationId, body, {
+        onUserMessage: (m) => setOptimisticUser(m),
+        onChunk: (delta) => setStreamingText((s) => s + delta),
+        onAssistantMessage: () => {
+          // final message will be returned via the conversations refetch below
+        },
+        onError: (e) => {
+          errored = true;
+          if (e.error === "assistant_not_configured") {
+            setNotConfigured(true);
+          } else {
+            toast({
+              title: "Assistant error",
+              description: e.message,
+              variant: "destructive",
+            });
+          }
+        },
+        onDone: () => {},
       });
-      invalidate();
     } catch (err: unknown) {
+      errored = true;
       const message =
         err instanceof Error ? err.message : "Failed to send message.";
       toast({
@@ -338,7 +466,26 @@ export default function AssistantPage() {
         description: message,
         variant: "destructive",
       });
+    } finally {
+      setIsStreaming(false);
+      setStreamingText("");
+      setOptimisticUser(null);
+      if (!errored) {
+        await qc.invalidateQueries();
+      } else {
+        // still refresh list so optimistic state clears
+        await qc.invalidateQueries();
+      }
     }
+  }
+
+  async function handleSend(content: string) {
+    const trimmed = content.trim();
+    if (!trimmed || isSending) return;
+    setNotConfigured(false);
+    const id = await ensureConversationId();
+    setInput("");
+    await runStream(id, { content: trimmed, agentMode: mode });
   }
 
   async function handleRegenerate(targetMessageId: string) {
@@ -354,24 +501,13 @@ export default function AssistantPage() {
       }
     }
     if (!priorUser) return;
+    setNotConfigured(false);
     setRegeneratingId(targetMessageId);
     try {
-      await postMessage.mutateAsync({
-        id: activeId,
-        data: {
-          content: priorUser.content,
-          agentMode: mode,
-          regenerate: true,
-        },
-      });
-      invalidate();
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Failed to regenerate.";
-      toast({
-        title: "Regenerate failed",
-        description: message,
-        variant: "destructive",
+      await runStream(activeId, {
+        content: priorUser.content,
+        agentMode: mode,
+        regenerate: true,
       });
     } finally {
       setRegeneratingId(null);
@@ -535,6 +671,25 @@ export default function AssistantPage() {
                 <div className="flex h-full items-center justify-center">
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
+              ) : isEmpty && notConfigured ? (
+                <div
+                  className="flex h-full flex-col items-center justify-center gap-4 px-6 text-center"
+                  data-testid="empty-not-configured"
+                >
+                  <div className="grid h-12 w-12 place-items-center rounded-full bg-amber-500/15 text-amber-500">
+                    <KeyRound className="h-6 w-6" />
+                  </div>
+                  <div className="max-w-md space-y-1">
+                    <div className="text-sm font-medium">
+                      Assistant not configured yet
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Add your Azure OpenAI credentials
+                      (AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT)
+                      and restart the API server to start chatting.
+                    </div>
+                  </div>
+                </div>
               ) : isEmpty ? (
                 <div className="flex h-full flex-col items-center justify-center gap-6 px-6 text-center">
                   <div className="grid h-12 w-12 place-items-center rounded-full bg-accent/20 text-accent">
@@ -580,7 +735,24 @@ export default function AssistantPage() {
                       isRegenerating={regeneratingId === m.id}
                     />
                   ))}
-                  <StreamingBubble visible={isSending && !regeneratingId} />
+                  {optimisticUser && (
+                    <MessageBubble
+                      key="optimistic-user"
+                      message={optimisticUser}
+                      onCopy={() => {}}
+                    />
+                  )}
+                  {isStreaming && streamingText && (
+                    <div className="flex justify-start" data-testid="bubble-streaming">
+                      <div className="max-w-[85%] rounded-2xl border border-border/70 bg-card/70 px-4 py-3 text-sm text-foreground backdrop-blur">
+                        <MarkdownBubble content={streamingText} />
+                        <span className="ml-1 inline-block h-3 w-1 animate-pulse bg-foreground/60" />
+                      </div>
+                    </div>
+                  )}
+                  <StreamingBubble
+                    visible={isSending && !streamingText}
+                  />
                 </div>
               )}
             </div>
@@ -601,6 +773,18 @@ export default function AssistantPage() {
             onSubmit={onSubmit}
             className="flex items-end gap-2 border-t border-border/70 p-3"
           >
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-[60px] w-10 shrink-0 text-muted-foreground"
+              disabled
+              title="Attachments coming soon"
+              aria-label="Add attachment (coming soon)"
+              data-testid="button-attach"
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}

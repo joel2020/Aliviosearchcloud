@@ -4,6 +4,7 @@ import {
   db,
   assistantConversationsTable,
   assistantMessagesTable,
+  agentRunsTable,
   type AssistantConversation,
   type AssistantMessage,
 } from "@workspace/db";
@@ -358,12 +359,128 @@ router.post(
         return;
       }
 
+      // Pull recent agent runs to enrich business context
+      const recentRunRows = await db
+        .select()
+        .from(agentRunsTable)
+        .where(eq(agentRunsTable.businessId, business.id))
+        .orderBy(desc(agentRunsTable.startedAt))
+        .limit(5);
+      const recentRuns = recentRunRows.map((r) => {
+        const out = (r.output ?? {}) as { summary?: string };
+        return {
+          agentSlug: r.agentSlug,
+          status: r.status,
+          completedAt: r.completedAt
+            ? r.completedAt.toISOString()
+            : null,
+          summary:
+            typeof out.summary === "string" ? out.summary.slice(0, 240) : "",
+        };
+      });
+
+      // SSE streaming when ?stream=1
+      const wantStream = req.query.stream === "1";
+      if (wantStream) {
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache, no-transform");
+        res.setHeader("Connection", "keep-alive");
+        res.flushHeaders?.();
+        const sendEvent = (event: string, data: unknown) => {
+          res.write(`event: ${event}\n`);
+          res.write(`data: ${JSON.stringify(data)}\n\n`);
+        };
+        if (userMessage) {
+          sendEvent("user_message", serializeMessage(userMessage));
+        }
+
+        const { run } = await executeAgentRun({
+          agent: businessAssistantAgent,
+          rawInput: {
+            message: triggerContent,
+            history: priorHistory,
+            mode,
+            recentRuns,
+          },
+          user,
+          business,
+          log: req.log,
+        });
+
+        if (run.status === "not_configured") {
+          sendEvent("error", {
+            error: "assistant_not_configured",
+            message:
+              "Assistant not configured — Azure OpenAI credentials are missing.",
+          });
+          res.end();
+          return;
+        }
+        if (run.status !== "ok") {
+          sendEvent("error", {
+            error: "assistant_failed",
+            message: "Assistant run failed.",
+          });
+          res.end();
+          return;
+        }
+
+        const output = (run.output ?? {}) as {
+          summary?: string;
+          suggestedActions?: string[];
+        };
+        const reply = output.summary?.trim() ?? "";
+        const suggestedActions = Array.isArray(output.suggestedActions)
+          ? output.suggestedActions.filter((s) => typeof s === "string")
+          : [];
+
+        // Stream the reply word-by-word so the UI can render progressively
+        const tokens = reply.split(/(\s+)/);
+        for (const tok of tokens) {
+          sendEvent("chunk", { delta: tok });
+        }
+
+        const insertedAssistant = await db
+          .insert(assistantMessagesTable)
+          .values({
+            id: shortId("msg"),
+            conversationId: conv[0].id,
+            userId: user.id,
+            businessId: business.id,
+            channel: "web",
+            role: "assistant",
+            content: reply || "(no reply generated)",
+            agentMode: mode,
+            metadata: {
+              agentRunId: run.id,
+              tokensUsed: run.tokensUsed,
+              suggestedActions,
+              promptVersion: businessAssistantAgent.promptVersion,
+              agentRunStatus: run.status,
+            },
+          })
+          .returning();
+        const refreshed = await db
+          .update(assistantConversationsTable)
+          .set({ updatedAt: new Date(), agentMode: mode })
+          .where(eq(assistantConversationsTable.id, conv[0].id))
+          .returning();
+        sendEvent("assistant_message", serializeMessage(insertedAssistant[0]!));
+        sendEvent("done", {
+          conversation: serializeConversation(refreshed[0] ?? conv[0]),
+          suggestedActions,
+        });
+        res.end();
+        return;
+      }
+
       const { run } = await executeAgentRun({
         agent: businessAssistantAgent,
         rawInput: {
           message: triggerContent,
           history: priorHistory,
           mode,
+          recentRuns,
         },
         user,
         business,
@@ -379,9 +496,13 @@ router.post(
         return;
       }
       if (run.status !== "ok") {
+        req.log.error(
+          { agentRunId: run.id, errorMessage: run.errorMessage },
+          "business-assistant run failed",
+        );
         res.status(502).json({
           error: "assistant_failed",
-          message: run.errorMessage ?? "Assistant run failed.",
+          message: "Assistant run failed. Please try again.",
         });
         return;
       }

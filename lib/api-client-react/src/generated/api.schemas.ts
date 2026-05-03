@@ -338,3 +338,17 @@ export type ListAgentRunsParams = {
   limit?: number;
   agentId?: string;
 };
+
+export type PostAssistantMessageParams = {
+  /**
+   * When set to `1`, response is a `text/event-stream` SSE body.
+   */
+  stream?: PostAssistantMessageStream;
+};
+
+export type PostAssistantMessageStream =
+  (typeof PostAssistantMessageStream)[keyof typeof PostAssistantMessageStream];
+
+export const PostAssistantMessageStream = {
+  NUMBER_1: "1",
+} as const;

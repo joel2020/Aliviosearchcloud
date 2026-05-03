@@ -8,6 +8,13 @@
       "when": 1777785019836,
       "tag": "0000_gorgeous_diamondback",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777792323244,
+      "tag": "0001_right_toad_men",
+      "breakpoints": true
     }
   ]
 }

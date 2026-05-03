@@ -434,15 +434,30 @@ paths:
       summary: Send a user message and get the assistant reply
       description: |
         Persists the user message, runs the Business Assistant agent against
-        full business context, persists the assistant reply, and returns the
-        updated message pair. SSE streaming may be added behind the same path
-        in a future revision; this JSON variant is the always-supported fallback.
+        full business context (business profile + recent agent runs +
+        conversation history), persists the assistant reply, and returns the
+        updated message pair.
+
+        When `?stream=1` is passed, the endpoint responds with a
+        `text/event-stream` SSE body that emits the following events:
+          - `user_message` — the persisted user row
+          - `chunk` — `{ delta: string }` for each token
+          - `assistant_message` — the persisted assistant row
+          - `done` — `{ conversation, suggestedActions }`
+          - `error` — `{ error, message }` (e.g. `assistant_not_configured`)
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+        - in: query
+          name: stream
+          required: false
+          description: When set to `1`, response is a `text/event-stream` SSE body.
+          schema:
+            type: string
+            enum: ["1"]
       requestBody:
         required: true
         content:
