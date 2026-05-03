@@ -86,6 +86,28 @@ Shared libraries:
 - Optional: `AZURE_OPENAI_DEPLOYMENT`, `AZURE_OPENAI_API_VERSION`,
   `CORS_ALLOWED_ORIGINS`
 
+## Free Audit Pipeline (Week 1 deliverable)
+
+Anonymous prospects submit `marketing/pages/Audit.tsx` →
+`POST /api/audit/request` (rate-limited 5/hour per `req.ip` + 3/day per email,
+trust-proxy=1) inserts into `audits` (status=pending) and kicks off
+`generateAudit(auditId)` via `setImmediate`. Generation is **idempotent**: an
+atomic conditional UPDATE only transitions `pending|failed → generating`, so
+duplicate fires are no-ops. Pipeline calls `agentRegistry.get("revenue-leak")`
+with synthesised business+user context, renders a branded multi-page PDF via
+`pdfkit` (cached in-memory + emailed as attachment via Resend), and mirrors
+the lead into the `leads` CRM table (partial unique index
+`leads_audit_id_unique_idx` enforces one lead per audit; on conflict the row
+score/notes are refreshed). The success page `marketing/pages/AuditResult.tsx`
+polls `GET /api/audit/{id}?token=...` every 2.5s until `ready|failed` and
+shows leaks/quick-wins + token-gated PDF download (`/api/audit/{id}/pdf`).
+PDF cache miss falls back to regenerating from the persisted JSONB content.
+
+**Build externals**: `pdfkit`, `fontkit`, `brotli`, `linebreak`,
+`unicode-properties`, `unicode-trie` are externalized in
+`artifacts/api-server/build.mjs` because fontkit dynamically requires
+`@swc/helpers`; `@swc/helpers` is also installed as a runtime dep.
+
 ## Conventions
 
 - Never run `pnpm dev` at the workspace root — use Replit workflows.

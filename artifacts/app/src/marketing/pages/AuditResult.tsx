@@ -143,7 +143,9 @@ export default function AuditResult() {
               <p className="text-sm text-muted-foreground">
                 {data.emailedAt
                   ? `Also sent to your inbox at ${new Date(data.emailedAt).toLocaleString()}.`
-                  : "Email delivery is queued — meanwhile you can download the PDF below."}
+                  : data.errorMessage
+                    ? `We couldn't email it (${data.errorMessage}). Please download the PDF below — and forward it to yourself.`
+                    : "Email is on its way — in the meantime you can download the PDF below."}
               </p>
             </div>
           </div>

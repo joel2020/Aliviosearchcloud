@@ -14,20 +14,39 @@ const router: IRouter = Router();
 
 const RATE_LIMIT_PER_HOUR = 5;
 const RATE_WINDOW_MS = 60 * 60 * 1000;
+const EMAIL_LIMIT_PER_DAY = 3;
+const EMAIL_WINDOW_MS = 24 * 60 * 60 * 1000;
 const ipBuckets = new Map<string, number[]>();
+const emailBuckets = new Map<string, number[]>();
 
-function consumeRateToken(ip: string): boolean {
+function consumeFromBucket(
+  buckets: Map<string, number[]>,
+  key: string,
+  limit: number,
+  windowMs: number,
+): boolean {
   const now = Date.now();
-  const arr = (ipBuckets.get(ip) ?? []).filter(
-    (t) => now - t < RATE_WINDOW_MS,
-  );
-  if (arr.length >= RATE_LIMIT_PER_HOUR) {
-    ipBuckets.set(ip, arr);
+  const arr = (buckets.get(key) ?? []).filter((t) => now - t < windowMs);
+  if (arr.length >= limit) {
+    buckets.set(key, arr);
     return false;
   }
   arr.push(now);
-  ipBuckets.set(ip, arr);
+  buckets.set(key, arr);
   return true;
+}
+
+function consumeRateToken(ip: string): boolean {
+  return consumeFromBucket(ipBuckets, ip, RATE_LIMIT_PER_HOUR, RATE_WINDOW_MS);
+}
+
+function consumeEmailToken(email: string): boolean {
+  return consumeFromBucket(
+    emailBuckets,
+    email,
+    EMAIL_LIMIT_PER_DAY,
+    EMAIL_WINDOW_MS,
+  );
 }
 
 function makeAccessToken(): string {
@@ -36,14 +55,25 @@ function makeAccessToken(): string {
 
 router.post("/request", async (req, res, next) => {
   try {
-    const ip =
-      req.header("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.ip ||
-      "unknown";
+    // `req.ip` is set by Express from the trusted proxy (see `trust proxy`
+    // in app.ts) — do NOT read x-forwarded-for directly, it's spoofable.
+    const ip = req.ip || "unknown";
     if (!consumeRateToken(ip)) {
       res.status(429).json({
         error: "rate_limited",
         message: "Too many audit requests from this network. Try again later.",
+      });
+      return;
+    }
+    // Per-email cap (3/day) so an attacker rotating IPs can't spam one inbox.
+    const emailNorm = String(req.body?.leadEmail ?? "")
+      .trim()
+      .toLowerCase();
+    if (emailNorm && !consumeEmailToken(emailNorm)) {
+      res.status(429).json({
+        error: "rate_limited",
+        message:
+          "We've already generated an audit for this email recently. Check your inbox or contact us.",
       });
       return;
     }

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and, inArray, sql } from "drizzle-orm";
 import { db, auditsTable, leadsTable, type Audit } from "@workspace/db";
 import { agentRegistry } from "@workspace/agents";
 import {
@@ -79,10 +79,26 @@ export async function generateAudit(auditId: string): Promise<void> {
   }
 
   try {
-    await db
+    // Atomic claim: only transition pending|failed -> generating. If another
+    // worker already claimed it (or it's already ready) we silently skip so
+    // setImmediate retries / cron sweeps can't double-bill the lead.
+    const claimed = await db
       .update(auditsTable)
-      .set({ status: "generating", updatedAt: new Date() })
-      .where(eq(auditsTable.id, auditId));
+      .set({ status: "generating", errorMessage: null, updatedAt: new Date() })
+      .where(
+        and(
+          eq(auditsTable.id, auditId),
+          inArray(auditsTable.status, ["pending", "failed"]),
+        ),
+      )
+      .returning({ id: auditsTable.id });
+    if (claimed.length === 0) {
+      log.info(
+        { currentStatus: audit.status },
+        "generateAudit: skipped (already claimed)",
+      );
+      return;
+    }
 
     let ai;
     try {
@@ -171,6 +187,9 @@ export async function generateAudit(auditId: string): Promise<void> {
     // Mirror the audit lead into the in-house CRM so it shows up in the
     // pipeline immediately — this is the seam the Week 3 CRM UI hangs off.
     try {
+      // The partial unique index `leads_audit_id_unique_idx` enforces one CRM
+      // row per audit; on conflict we update the score/notes so a re-run
+      // refreshes the kanban card instead of duplicating it.
       await db
         .insert(leadsTable)
         .values({
@@ -187,7 +206,15 @@ export async function generateAudit(auditId: string): Promise<void> {
           notes: `Estimated leak: $${totalLoss.toLocaleString()}/mo. Top finding: ${content.leaks[0]?.title ?? "—"}`,
           auditId: audit.id,
         })
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: leadsTable.auditId,
+          targetWhere: sql`${leadsTable.auditId} IS NOT NULL`,
+          set: {
+            score: Math.min(100, Math.round(totalLoss / 500)),
+            notes: `Estimated leak: $${totalLoss.toLocaleString()}/mo. Top finding: ${content.leaks[0]?.title ?? "—"}`,
+            updatedAt: new Date(),
+          },
+        });
     } catch (err) {
       log.warn({ err }, "auditGenerator: failed to mirror lead into CRM");
     }

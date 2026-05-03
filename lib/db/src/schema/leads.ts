@@ -1,4 +1,13 @@
-import { pgTable, text, timestamp, integer, jsonb, index } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  integer,
+  jsonb,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { businessesTable } from "./businesses";
@@ -68,6 +77,12 @@ export const leadsTable = pgTable(
     index("leads_email_idx").on(t.email),
     index("leads_stage_idx").on(t.stage),
     index("leads_next_action_idx").on(t.nextActionAt),
+    // Each audit produces at most one CRM lead row. Partial unique index
+    // (Postgres only enforces uniqueness for non-null audit_id values) so
+    // manual / cold-email leads with no audit_id are unaffected.
+    uniqueIndex("leads_audit_id_unique_idx")
+      .on(t.auditId)
+      .where(sql`${t.auditId} IS NOT NULL`),
   ],
 );
 
