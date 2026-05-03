@@ -20,7 +20,6 @@ import { clerkAppearance, basePath } from "@/lib/clerkAppearance";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-import LandingPage from "@/pages/landing";
 import DashboardPage from "@/pages/dashboard";
 import AgentsPage from "@/pages/agents";
 import AssistantPage from "@/pages/assistant";
@@ -28,6 +27,12 @@ import SearchPage from "@/pages/search";
 import SettingsPage from "@/pages/settings";
 import NotFound from "@/pages/not-found";
 import { AppShell } from "@/components/shell/AppShell";
+
+import MarketingHome from "@/marketing/pages/Home";
+import MarketingPricing from "@/marketing/pages/Pricing";
+import MarketingAgents from "@/marketing/pages/Agents";
+import MarketingAbout from "@/marketing/pages/About";
+import MarketingContact from "@/marketing/pages/Contact";
 
 const clerkPubKey = publishableKeyFromHost(
   typeof window !== "undefined" ? window.location.hostname : "",
@@ -52,7 +57,26 @@ function HomeRedirect() {
         <Redirect to="/dashboard" />
       </Show>
       <Show when="signed-out">
-        <LandingPage />
+        <MarketingHome />
+      </Show>
+    </>
+  );
+}
+
+/**
+ * `/agents` is dual-purpose: signed-out visitors see the public marketing
+ * page, signed-in users see the in-app agent workspace inside the shell.
+ */
+function AgentsRoute() {
+  return (
+    <>
+      <Show when="signed-in">
+        <AppShell>
+          <AgentsPage />
+        </AppShell>
+      </Show>
+      <Show when="signed-out">
+        <MarketingAgents />
       </Show>
     </>
   );
@@ -154,8 +178,19 @@ function ClerkProviderWithRoutes() {
             <Route path="/dashboard">
               <ProtectedShell><DashboardPage /></ProtectedShell>
             </Route>
-            <Route path="/agents">
-              <ProtectedShell><AgentsPage /></ProtectedShell>
+            <Route path="/agents" component={AgentsRoute} />
+            <Route path="/pricing" component={MarketingPricing} />
+            <Route path="/about" component={MarketingAbout} />
+            <Route path="/contact" component={MarketingContact} />
+            {/* Placeholder routes for CTAs wired by downstream tasks
+                (Stripe payment links + Cal.com booking). They render
+                the pricing page so visitors land somewhere intentional
+                instead of a 404 until those integrations land. */}
+            <Route path="/book-call">
+              <Redirect to="/pricing" />
+            </Route>
+            <Route path="/install">
+              <Redirect to="/pricing" />
             </Route>
             <Route path="/assistant">
               <ProtectedShell><AssistantPage /></ProtectedShell>

@@ -7,9 +7,23 @@ Customer dashboard for the Alivio Search Cloud product — an AI workforce platf
 
 pnpm monorepo with three runtime artifacts:
 
-- `artifacts/app` — React + Vite customer dashboard, mounted at `/`. Dark-first
-  premium UI built on shadcn + tailwind v4 + framer-motion. Uses `@clerk/react`
-  v6 for auth (Replit-managed Clerk whitelabel) and `wouter` for routing.
+- `artifacts/app` — React + Vite customer dashboard **and public marketing
+  site**, mounted at `/`. Dark-first premium UI built on shadcn + tailwind v4
+  + framer-motion. Uses `@clerk/react` v6 for auth (Replit-managed Clerk
+  whitelabel) and `wouter` for routing. Marketing pages live in
+  `src/marketing/` (`Home`, `Pricing`, `Agents`, `About`, `Contact`) with a
+  shared `MarketingLayout` (sticky header, theme toggle persisted to
+  `localStorage` under `alivio-theme`, mobile drawer nav, footer). Public
+  routes are `/`, `/pricing`, `/agents`, `/about`, `/contact`. `/agents` is
+  dual-purpose: signed-out → marketing page, signed-in → in-app workspace
+  inside `AppShell`. `/book-call` and `/install` redirect to `/pricing` until
+  the Stripe + Cal.com task wires the real destinations. The four mandated
+  CTAs are centralized in `src/marketing/lib/ctas.ts` (`CTA_AUDIT`,
+  `CTA_BOOK_CALL`, `CTA_INSTALL`, `CTA_ASSISTANT`) so downstream tasks flip
+  hrefs in one place. SEO: per-route title/description/canonical/OG via
+  `src/marketing/lib/useSeo.ts`; static fallback meta + JSON-LD
+  (`Organization` + `WebSite`) in `index.html`; `public/sitemap.xml` and
+  `public/robots.txt` listing all 5 marketing routes.
 - `artifacts/api-server` — Express 5 API mounted at `/api`. Uses `@clerk/express`
   for auth, Drizzle ORM for Postgres, Azure OpenAI via `@workspace/azure-openai`.
 - `artifacts/mockup-sandbox` — Component preview server for canvas mockups.
