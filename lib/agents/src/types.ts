@@ -40,6 +40,17 @@ export interface AgentDefinition<
   temperature?: number;
   /** Optional: max tokens override. */
   maxTokens?: number;
+  /**
+   * Per-agent executor. Validates input against `inputSchema`, calls Azure
+   * OpenAI through `ctx.ai`, and validates the JSON output against
+   * `outputSchema`. Returned by every agent module via `defineAgent`.
+   * Does NOT touch the database — persistence is the caller's job
+   * (`executeAgentRun` in the api-server).
+   */
+  run: (
+    rawInput: unknown,
+    ctx: AgentRunContext,
+  ) => Promise<import("./runner").RunAgentResult>;
 }
 
 export interface AgentSummary {

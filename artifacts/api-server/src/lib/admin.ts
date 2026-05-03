@@ -2,10 +2,16 @@ import type { RequestHandler } from "express";
 import { getAuth } from "@clerk/express";
 
 /**
- * A user is an admin if either:
- * - their Clerk user ID is present in the comma-separated `ADMIN_USER_IDS`
- *   env var, OR
- * - their Clerk session has an org-level role of `admin` / `org:admin`.
+ * Admin authorization is intentionally narrow. A user is admin if either:
+ *   1. their Clerk user ID is listed in the comma-separated `ADMIN_USER_IDS`
+ *      env allowlist, OR
+ *   2. their active Clerk session has an org role of `admin` / `org:admin`
+ *      (Clerk's `auth.orgRole`, which is only populated when the user is
+ *      acting inside an organization context).
+ *
+ * We deliberately do NOT trust generic claims like `sessionClaims.role` or
+ * `sessionClaims.metadata.role`, because those can be set from public/user
+ * metadata and would create a privilege-escalation path.
  */
 export function isAdminUserId(clerkUserId: string): boolean {
   const list = (process.env["ADMIN_USER_IDS"] ?? "")
@@ -15,26 +21,11 @@ export function isAdminUserId(clerkUserId: string): boolean {
   return list.includes(clerkUserId);
 }
 
-interface AdminClaims {
-  org_role?: string;
-  orgRole?: string;
-  role?: string;
-  metadata?: { role?: string };
-}
-
-export function hasClerkAdminRole(
-  sessionClaims: AdminClaims | null | undefined,
+export function isClerkOrgAdminRole(
   orgRole: string | null | undefined,
 ): boolean {
-  if (typeof orgRole === "string" && /(^|:)admin$/.test(orgRole)) return true;
-  if (!sessionClaims) return false;
-  const candidates = [
-    sessionClaims.org_role,
-    sessionClaims.orgRole,
-    sessionClaims.role,
-    sessionClaims.metadata?.role,
-  ].filter((v): v is string => typeof v === "string");
-  return candidates.some((r) => /(^|:)admin$/.test(r));
+  if (typeof orgRole !== "string") return false;
+  return /(^|:)admin$/.test(orgRole);
 }
 
 export const requireAdmin: RequestHandler = (req, res, next) => {
@@ -47,10 +38,8 @@ export const requireAdmin: RequestHandler = (req, res, next) => {
     next();
     return;
   }
-  const auth = getAuth(req);
-  const claims = (auth?.sessionClaims ?? null) as AdminClaims | null;
-  const orgRole = (auth as { orgRole?: string } | null)?.orgRole ?? null;
-  if (hasClerkAdminRole(claims, orgRole)) {
+  const auth = getAuth(req) as { orgRole?: string | null } | null;
+  if (isClerkOrgAdminRole(auth?.orgRole ?? null)) {
     next();
     return;
   }

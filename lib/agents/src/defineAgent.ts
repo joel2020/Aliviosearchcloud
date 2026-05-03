@@ -1,11 +1,27 @@
 import type { z } from "zod";
-import type { AgentDefinition } from "./types";
+import type { AgentDefinition, AgentRunContext } from "./types";
+import { runAgent, type RunAgentResult } from "./runner";
 
-/** Identity helper that preserves precise generic types for each agent module. */
+type AgentSpec<I extends z.ZodTypeAny, O extends z.ZodTypeAny> = Omit<
+  AgentDefinition<I, O>,
+  "run"
+>;
+
+/**
+ * Identity helper that:
+ *   - preserves precise generic types for each agent module, and
+ *   - automatically wires the per-agent `run(input, ctx)` executor so every
+ *     agent module exposes the required contract without boilerplate.
+ */
 export function defineAgent<I extends z.ZodTypeAny, O extends z.ZodTypeAny>(
-  spec: AgentDefinition<I, O>,
+  spec: AgentSpec<I, O>,
 ): AgentDefinition<I, O> {
-  return spec;
+  const agent: AgentDefinition<I, O> = {
+    ...spec,
+    run: (rawInput: unknown, ctx: AgentRunContext): Promise<RunAgentResult> =>
+      runAgent({ agent, rawInput, ctx }),
+  };
+  return agent;
 }
 
 /** Shared business-context block included in every agent's user message. */
