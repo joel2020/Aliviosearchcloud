@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSeo } from "@/marketing/lib/useSeo";
-import { CTA_BOOK_CALL } from "@/marketing/lib/ctas";
+import { CTAButton } from "@/components/CTAButton";
 import { Phone, Mail, MessageSquare, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 
@@ -44,9 +44,12 @@ export default function Contact() {
                   <h3 className="text-xl font-semibold">Sales</h3>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">Discuss custom implementations and high-volume needs.</p>
-                <Link href={CTA_BOOK_CALL.href}>
-                  <Button variant="outline" className="w-full">{CTA_BOOK_CALL.label}</Button>
-                </Link>
+                <CTAButton
+                  cta="book-call"
+                  variant="outline"
+                  className="w-full"
+                  data-testid="cta-book-call-contact"
+                />
               </div>
 
               <div className="rounded-2xl border border-border bg-card p-6">

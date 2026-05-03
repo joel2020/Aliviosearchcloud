@@ -9,6 +9,7 @@ import adminRouter from "./admin";
 import dashboardRouter from "./dashboard";
 import searchRouter from "./search";
 import assistantRouter from "./assistant";
+import configRouter from "./config";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use("/admin", adminRouter);
 router.use("/dashboard", dashboardRouter);
 router.use("/search", searchRouter);
 router.use("/assistant", assistantRouter);
+router.use("/config", configRouter);
 
 export default router;

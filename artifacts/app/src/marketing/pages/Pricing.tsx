@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSeo } from "@/marketing/lib/useSeo";
-import { CTA_INSTALL, CTA_BOOK_CALL } from "@/marketing/lib/ctas";
+import { CTAButton } from "@/components/CTAButton";
 
 export default function Pricing() {
   useSeo({
@@ -67,11 +67,12 @@ export default function Pricing() {
                   </div>
                 </div>
                 
-                <Link href={CTA_INSTALL.href}>
-                  <Button size="lg" className="w-full text-lg h-14 font-semibold shadow-xl shadow-primary/20">
-                    {CTA_INSTALL.label}
-                  </Button>
-                </Link>
+                <CTAButton
+                  cta="install"
+                  size="lg"
+                  className="w-full text-lg h-14 font-semibold shadow-xl shadow-primary/20"
+                  data-testid="cta-install-pricing"
+                />
               </div>
               
               <div className="flex-1 md:border-l md:border-border/50 md:pl-12">
@@ -117,9 +118,12 @@ export default function Pricing() {
         <div className="mx-auto max-w-2xl">
           <h2 className="text-3xl font-bold mb-6">Need a custom enterprise setup?</h2>
           <p className="text-muted-foreground mb-8">For high-volume operations requiring deep CRM integrations and custom agent workflows.</p>
-          <Link href={CTA_BOOK_CALL.href}>
-            <Button variant="outline" size="lg">{CTA_BOOK_CALL.label}</Button>
-          </Link>
+          <CTAButton
+            cta="book-call"
+            variant="outline"
+            size="lg"
+            data-testid="cta-book-call-pricing"
+          />
         </div>
       </section>
     </MarketingLayout>

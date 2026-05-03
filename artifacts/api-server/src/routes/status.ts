@@ -5,6 +5,7 @@ import {
   AzureOpenAINotConfiguredError,
   getAzureOpenAIConfig,
 } from "@workspace/azure-openai";
+import { getPublicConfig } from "../lib/publicConfig";
 
 const router: IRouter = Router();
 
@@ -35,16 +36,12 @@ router.get("/", async (req, res) => {
     }
   }
 
-  // Stripe / Cal / Twilio status reflect actual env presence so this endpoint
-  // accurately mirrors deployment state. They will report `configured` as
-  // soon as the downstream tasks (Stripe billing, messaging) wire credentials.
-  const stripe: StatusValue = process.env["STRIPE_SECRET_KEY"]
-    ? "configured"
-    : "not_configured";
-  const calLink: StatusValue =
-    process.env["CAL_LINK"] || process.env["VITE_CAL_LINK"]
-      ? "configured"
-      : "not_configured";
+  // Stripe / Cal status come from the same source of truth as
+  // /api/config/public so the dashboard and the customer-facing CTAs cannot
+  // disagree.
+  const publicConfig = getPublicConfig();
+  const stripe: StatusValue = publicConfig.status.stripe;
+  const calLink: StatusValue = publicConfig.status.cal;
   const twilio: StatusValue =
     process.env["TWILIO_ACCOUNT_SID"] && process.env["TWILIO_AUTH_TOKEN"]
       ? "configured"

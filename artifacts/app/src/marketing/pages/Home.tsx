@@ -3,8 +3,9 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowRight, Bot, Target, Zap, CheckCircle2, ShieldCheck, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CTAButton } from "@/components/CTAButton";
 import { useSeo } from "@/marketing/lib/useSeo";
-import { CTA_AUDIT, CTA_BOOK_CALL, CTA_INSTALL, CTA_ASSISTANT } from "@/marketing/lib/ctas";
+import { CTA_AUDIT } from "@/marketing/lib/ctas";
 import { MARKETING_AGENTS } from "@/marketing/lib/agents";
 import { MARKETING_BLOG_POSTS, latestPosts } from "@/marketing/lib/blogPosts";
 import { Input } from "@/components/ui/input";
@@ -55,16 +56,20 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Link href={CTA_AUDIT.href}>
-              <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base font-semibold shadow-xl shadow-primary/20 gap-2">
-                {CTA_AUDIT.label} <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href={CTA_BOOK_CALL.href}>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base font-semibold">
-                {CTA_BOOK_CALL.label}
-              </Button>
-            </Link>
+            <CTAButton
+              cta="audit"
+              size="lg"
+              className="w-full sm:w-auto h-14 px-8 text-base font-semibold shadow-xl shadow-primary/20 gap-2"
+              trailing={<ArrowRight className="h-4 w-4" />}
+              data-testid="cta-audit-hero"
+            />
+            <CTAButton
+              cta="book-call"
+              size="lg"
+              variant="outline"
+              className="w-full sm:w-auto h-14 px-8 text-base font-semibold"
+              data-testid="cta-book-call-hero"
+            />
           </motion.div>
         </div>
       </section>
@@ -186,11 +191,12 @@ export default function Home() {
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-8 text-balance">
             See how much revenue you are losing before another lead disappears.
           </h2>
-          <Link href={CTA_AUDIT.href}>
-            <Button size="lg" className="h-14 px-10 text-lg font-bold shadow-xl shadow-primary/20">
-              {CTA_AUDIT.label}
-            </Button>
-          </Link>
+          <CTAButton
+            cta="audit"
+            size="lg"
+            className="h-14 px-10 text-lg font-bold shadow-xl shadow-primary/20"
+            data-testid="cta-audit-band"
+          />
         </motion.div>
       </section>
 
@@ -210,11 +216,14 @@ export default function Home() {
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href={CTA_INSTALL.href} className="flex-1">
-                    <Button size="lg" className="w-full text-base font-semibold">
-                      {CTA_INSTALL.label}
-                    </Button>
-                  </Link>
+                  <div className="flex-1">
+                    <CTAButton
+                      cta="install"
+                      size="lg"
+                      className="w-full text-base font-semibold"
+                      data-testid="cta-install-offer"
+                    />
+                  </div>
                   <Link href="/pricing" className="flex-1">
                     <Button size="lg" variant="outline" className="w-full text-base">
                       See full pricing
@@ -285,24 +294,30 @@ export default function Home() {
         <div className="mx-auto max-w-4xl text-center relative z-10">
           <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">Stop losing leads. Start scaling revenue.</h2>
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-            <Link href={CTA_AUDIT.href}>
-              <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-lg font-bold shadow-xl">
-                {CTA_AUDIT.label}
-              </Button>
-            </Link>
-            <Link href={CTA_BOOK_CALL.href}>
-              <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-10 text-lg font-bold bg-background">
-                {CTA_BOOK_CALL.label}
-              </Button>
-            </Link>
+            <CTAButton
+              cta="audit"
+              size="lg"
+              className="w-full sm:w-auto h-14 px-10 text-lg font-bold shadow-xl"
+              data-testid="cta-audit-final"
+            />
+            <CTAButton
+              cta="book-call"
+              size="lg"
+              variant="outline"
+              className="w-full sm:w-auto h-14 px-10 text-lg font-bold bg-background"
+              data-testid="cta-book-call-final"
+            />
           </div>
           <div className="mb-6">
-            <Link href={CTA_ASSISTANT.href}>
-              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
-                Already a customer? {CTA_ASSISTANT.label}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
+            <CTAButton
+              cta="assistant"
+              variant="ghost"
+              size="sm"
+              className="gap-2 text-muted-foreground hover:text-foreground"
+              label="Already a customer? Talk to my AI Assistant"
+              trailing={<ArrowRight className="h-3.5 w-3.5" />}
+              data-testid="cta-assistant-final"
+            />
           </div>
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <ShieldCheck className="h-4 w-4 text-primary" />

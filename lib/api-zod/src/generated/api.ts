@@ -532,6 +532,28 @@ export const PostAssistantMessageResponse = zod.object({
 });
 
 /**
+ * Returns the small set of public values the frontend needs to render
+marketing CTAs (Stripe payment links, Cal.com booking link) along
+with a per-service `configured | not_configured` status flag.
+Never returns secret values such as `STRIPE_SECRET_KEY`.
+
+ * @summary Public runtime configuration
+ */
+export const GetPublicConfigResponse = zod.object({
+  stripe: zod.object({
+    auditLink: zod.string().nullable(),
+    engineLink: zod.string().nullable(),
+  }),
+  cal: zod.object({
+    link: zod.string().nullable(),
+  }),
+  status: zod.object({
+    stripe: zod.enum(["configured", "not_configured"]),
+    cal: zod.enum(["configured", "not_configured"]),
+  }),
+});
+
+/**
  * @summary Smoke-test every agent (admin only)
  */
 export const SmokeTestAgentsResponse = zod.object({

@@ -4,7 +4,7 @@ import { Bot, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSeo } from "@/marketing/lib/useSeo";
 import { MARKETING_AGENTS } from "@/marketing/lib/agents";
-import { CTA_AUDIT } from "@/marketing/lib/ctas";
+import { CTAButton } from "@/components/CTAButton";
 
 export default function Agents() {
   useSeo({
@@ -77,9 +77,12 @@ export default function Agents() {
         <div className="mx-auto max-w-2xl">
           <h2 className="text-3xl font-bold mb-6">Ready to deploy your agents?</h2>
           <p className="text-muted-foreground mb-8">Run an audit to see exactly which agents will have the biggest impact on your bottom line today.</p>
-          <Link href={CTA_AUDIT.href}>
-            <Button size="lg" className="h-14 px-8 text-lg">{CTA_AUDIT.label}</Button>
-          </Link>
+          <CTAButton
+            cta="audit"
+            size="lg"
+            className="h-14 px-8 text-lg"
+            data-testid="cta-audit-agents"
+          />
         </div>
       </section>
     </MarketingLayout>

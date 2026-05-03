@@ -1,7 +1,5 @@
 export * from "./generated/api";
-export type {
-  PostAssistantMessageParams as PostAssistantMessageParamsType,
-} from "./generated/types";
+export type { PostAssistantMessageParams as PostAssistantMessageParamsType } from "./generated/types";
 export type * from "./generated/types/agentDetail";
 export type * from "./generated/types/agentDetailMode";
 export type * from "./generated/types/agentInputField";
@@ -29,6 +27,11 @@ export type * from "./generated/types/healthStatus";
 export type * from "./generated/types/listAgentRunsParams";
 export type * from "./generated/types/postAssistantMessageInput";
 export type * from "./generated/types/postAssistantMessageStream";
+export type * from "./generated/types/publicConfig";
+export type * from "./generated/types/publicConfigCal";
+export type * from "./generated/types/publicConfigStatus";
+export type * from "./generated/types/publicConfigStripe";
+export type * from "./generated/types/publicStatusValue";
 export type * from "./generated/types/runAgentRequest";
 export type * from "./generated/types/runAgentRequestInput";
 export type * from "./generated/types/searchAgentHit";

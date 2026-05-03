@@ -32,6 +32,7 @@ import type {
   ListAgentRunsParams,
   PostAssistantMessageInput,
   PostAssistantMessageParams,
+  PublicConfig,
   RunAgentRequest,
   SearchResults,
   SearchWorkspaceParams,
@@ -1509,6 +1510,86 @@ export const usePostAssistantMessage = <
 > => {
   return useMutation(getPostAssistantMessageMutationOptions(options));
 };
+
+/**
+ * Returns the small set of public values the frontend needs to render
+marketing CTAs (Stripe payment links, Cal.com booking link) along
+with a per-service `configured | not_configured` status flag.
+Never returns secret values such as `STRIPE_SECRET_KEY`.
+
+ * @summary Public runtime configuration
+ */
+export const getGetPublicConfigUrl = () => {
+  return `/api/config/public`;
+};
+
+export const getPublicConfig = async (
+  options?: RequestInit,
+): Promise<PublicConfig> => {
+  return customFetch<PublicConfig>(getGetPublicConfigUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetPublicConfigQueryKey = () => {
+  return [`/api/config/public`] as const;
+};
+
+export const getGetPublicConfigQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPublicConfig>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getPublicConfig>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetPublicConfigQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicConfig>>> = ({
+    signal,
+  }) => getPublicConfig({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPublicConfig>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetPublicConfigQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPublicConfig>>
+>;
+export type GetPublicConfigQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Public runtime configuration
+ */
+
+export function useGetPublicConfig<
+  TData = Awaited<ReturnType<typeof getPublicConfig>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getPublicConfig>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetPublicConfigQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Smoke-test every agent (admin only)

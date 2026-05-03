@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shell/PageHeader";
 import { Section } from "@/components/shell/Section";
 import { agentMeta, agentName, formatRelative, statusTone } from "@/lib/agentMeta";
+import { CTAButton } from "@/components/CTAButton";
 
 const QUICK_LAUNCH = [
   { id: "revenue-leak", title: "Find revenue leaks", blurb: "Audit your funnel for missed money." },
@@ -48,6 +49,16 @@ export default function DashboardPage() {
             : `Welcome back, ${user?.fullName ?? user?.email ?? "operator"}.`
         }
       />
+
+      <div className="flex flex-wrap gap-2" data-testid="dashboard-quick-ctas">
+        <CTAButton cta="install" size="sm" data-testid="cta-install-dashboard" />
+        <CTAButton
+          cta="book-call"
+          size="sm"
+          variant="outline"
+          data-testid="cta-book-call-dashboard"
+        />
+      </div>
 
       {isError ? (
         <Card className="border-destructive/30 bg-destructive/10">

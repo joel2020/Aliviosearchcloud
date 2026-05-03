@@ -28,6 +28,8 @@ tags:
     description: Cross-workspace search
   - name: assistant
     description: Business Assistant chat
+  - name: config
+    description: Public runtime configuration
 paths:
   /healthz:
     get:
@@ -501,6 +503,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /config/public:
+    get:
+      operationId: getPublicConfig
+      tags: [config]
+      summary: Public runtime configuration
+      description: |
+        Returns the small set of public values the frontend needs to render
+        marketing CTAs (Stripe payment links, Cal.com booking link) along
+        with a per-service `configured | not_configured` status flag.
+        Never returns secret values such as `STRIPE_SECRET_KEY`.
+      responses:
+        "200":
+          description: Public configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicConfig"
   /admin/agents/smoke-test:
     post:
       operationId: smokeTestAgents
@@ -850,6 +869,38 @@ components:
     ServiceStatusValue:
       type: string
       enum: [ok, configured, not_configured, error]
+    PublicStatusValue:
+      type: string
+      enum: [configured, not_configured]
+    PublicConfig:
+      type: object
+      properties:
+        stripe:
+          type: object
+          properties:
+            auditLink:
+              type: string
+              nullable: true
+            engineLink:
+              type: string
+              nullable: true
+          required: [auditLink, engineLink]
+        cal:
+          type: object
+          properties:
+            link:
+              type: string
+              nullable: true
+          required: [link]
+        status:
+          type: object
+          properties:
+            stripe:
+              $ref: "#/components/schemas/PublicStatusValue"
+            cal:
+              $ref: "#/components/schemas/PublicStatusValue"
+          required: [stripe, cal]
+      required: [stripe, cal, status]
     ServiceStatus:
       type: object
       properties:

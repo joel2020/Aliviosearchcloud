@@ -205,6 +205,34 @@ export const ServiceStatusValue = {
   error: "error",
 } as const;
 
+export type PublicStatusValue =
+  (typeof PublicStatusValue)[keyof typeof PublicStatusValue];
+
+export const PublicStatusValue = {
+  configured: "configured",
+  not_configured: "not_configured",
+} as const;
+
+export type PublicConfigStripe = {
+  auditLink: string | null;
+  engineLink: string | null;
+};
+
+export type PublicConfigCal = {
+  link: string | null;
+};
+
+export type PublicConfigStatus = {
+  stripe: PublicStatusValue;
+  cal: PublicStatusValue;
+};
+
+export interface PublicConfig {
+  stripe: PublicConfigStripe;
+  cal: PublicConfigCal;
+  status: PublicConfigStatus;
+}
+
 export type ServiceStatusMessaging = {
   twilio: ServiceStatusValue;
   whatsapp: ServiceStatusValue;

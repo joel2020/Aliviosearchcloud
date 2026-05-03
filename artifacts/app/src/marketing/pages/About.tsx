@@ -2,7 +2,7 @@ import { MarketingLayout } from "../components/MarketingLayout";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useSeo } from "@/marketing/lib/useSeo";
-import { CTA_AUDIT } from "@/marketing/lib/ctas";
+import { CTAButton } from "@/components/CTAButton";
 
 export default function About() {
   useSeo({
@@ -79,9 +79,12 @@ export default function About() {
       <section className="px-6 py-24 text-center border-t border-border/40 bg-card/30">
         <div className="mx-auto max-w-2xl">
           <h2 className="text-3xl font-bold mb-8">Join the businesses scaling with Alivio.</h2>
-          <Link href={CTA_AUDIT.href}>
-            <Button size="lg" className="h-14 px-8 text-lg">{CTA_AUDIT.label}</Button>
-          </Link>
+          <CTAButton
+            cta="audit"
+            size="lg"
+            className="h-14 px-8 text-lg"
+            data-testid="cta-audit-about"
+          />
         </div>
       </section>
     </MarketingLayout>
