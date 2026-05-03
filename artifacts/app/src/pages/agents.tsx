@@ -56,39 +56,42 @@ export default function AgentsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.025 }}
               >
-                <Link href={`/agents/${agent.id}`} data-testid={`agent-card-${agent.id}`}>
-                  <Card className="group flex h-full cursor-pointer flex-col border-border/70 bg-card/60 backdrop-blur hover-elevate">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                      <div className={`grid h-10 w-10 place-items-center rounded-lg bg-primary/10 ${meta.accent}`}>
-                        <meta.icon className="h-5 w-5" />
-                      </div>
-                      <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
-                        {agent.mode}
-                      </Badge>
-                    </CardHeader>
-                    <CardContent className="flex flex-1 flex-col justify-between gap-3">
-                      <div className="space-y-2">
-                        <CardTitle className="text-base">{agent.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          {agent.description}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-between gap-2 pt-2 text-xs text-muted-foreground">
-                        <span>
-                          {last
-                            ? `Last run ${formatRelative(last.startedAt)}`
-                            : "Never run"}
-                        </span>
+                <Card
+                  className="group flex h-full flex-col border-border/70 bg-card/60 backdrop-blur"
+                  data-testid={`agent-card-${agent.id}`}
+                >
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <div className={`grid h-10 w-10 place-items-center rounded-lg bg-primary/10 ${meta.accent}`}>
+                      <meta.icon className="h-5 w-5" />
+                    </div>
+                    <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
+                      {agent.mode}
+                    </Badge>
+                  </CardHeader>
+                  <CardContent className="flex flex-1 flex-col justify-between gap-3">
+                    <div className="space-y-2">
+                      <CardTitle className="text-base">{agent.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        {agent.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 pt-2 text-xs text-muted-foreground">
+                      <span>
+                        {last
+                          ? `Last run ${formatRelative(last.startedAt)}`
+                          : "Never run"}
+                      </span>
+                      <Link href={`/agents/${agent.id}`}>
                         <Button
                           size="sm"
-                          className="pointer-events-none opacity-95 group-hover:opacity-100"
+                          data-testid={`button-run-${agent.id}`}
                         >
                           Run agent
                         </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
               </motion.div>
             );
           })}

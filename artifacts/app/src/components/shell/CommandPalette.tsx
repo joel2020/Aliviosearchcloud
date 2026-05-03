@@ -17,9 +17,11 @@ import {
   Search,
   Settings,
   Activity,
+  Clock,
 } from "lucide-react";
 import { getSearchWorkspaceQueryOptions } from "@workspace/api-client-react";
 import { agentMeta } from "@/lib/agentMeta";
+import { useRecentSearches } from "@/lib/recentSearches";
 
 interface CommandPaletteProps {
   open: boolean;
@@ -47,6 +49,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const [, setLocation] = useLocation();
   const [query, setQuery] = useState("");
   const debounced = useDebounced(query.trim(), 200);
+  const { recents, record } = useRecentSearches();
 
   // Reset on close.
   useEffect(() => {
@@ -58,6 +61,11 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     enabled: open && debounced.length > 0,
     staleTime: 5_000,
   });
+
+  // Once results land for a typed query, remember it.
+  useEffect(() => {
+    if (data && debounced) record(debounced);
+  }, [data, debounced, record]);
 
   function go(href: string) {
     onOpenChange(false);
@@ -81,9 +89,28 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       <CommandList>
         {debounced && !hasResults ? (
           <CommandEmpty>No matches for “{debounced}”.</CommandEmpty>
-        ) : !debounced ? (
+        ) : !debounced && recents.length === 0 ? (
           <CommandEmpty>Start typing to search the workspace.</CommandEmpty>
         ) : null}
+
+        {!debounced && recents.length > 0 && (
+          <>
+            <CommandGroup heading="Recent searches">
+              {recents.map((r) => (
+                <CommandItem
+                  key={`recent-${r}`}
+                  value={`recent ${r}`}
+                  onSelect={() => setQuery(r)}
+                  data-testid={`palette-recent-${r.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
+                  {r}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+            <CommandSeparator />
+          </>
+        )}
 
         {data && data.agents.length > 0 && (
           <>

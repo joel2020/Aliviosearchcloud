@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
-import { Search as SearchIcon, ArrowRight } from "lucide-react";
+import { Search as SearchIcon, ArrowRight, Clock, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
   getSearchWorkspaceQueryOptions,
   type SearchResults,
 } from "@workspace/api-client-react";
+import { useRecentSearches } from "@/lib/recentSearches";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Card,
@@ -31,11 +33,17 @@ function useDebounced<T>(value: T, delay: number): T {
 export default function SearchPage() {
   const [q, setQ] = useState("");
   const debounced = useDebounced(q.trim(), 250);
+  const { recents, record, clear } = useRecentSearches();
 
   const { data, isFetching } = useQuery({
     ...getSearchWorkspaceQueryOptions({ q: debounced || "_" }),
     enabled: debounced.length > 0,
   });
+
+  // Persist non-empty queries that produce a server response.
+  useEffect(() => {
+    if (data && debounced) record(debounced);
+  }, [data, debounced, record]);
 
   return (
     <div className="space-y-8" data-testid="page-search">
@@ -65,7 +73,11 @@ export default function SearchPage() {
       </Card>
 
       {!debounced ? (
-        <EmptyHint />
+        <EmptyHint
+          recents={recents}
+          onPick={(value) => setQ(value)}
+          onClear={clear}
+        />
       ) : isFetching && !data ? (
         <ResultSkeleton />
       ) : data ? (
@@ -75,23 +87,64 @@ export default function SearchPage() {
   );
 }
 
-function EmptyHint() {
+function EmptyHint({
+  recents,
+  onPick,
+  onClear,
+}: {
+  recents: string[];
+  onPick: (value: string) => void;
+  onClear: () => void;
+}) {
   return (
-    <Card className="border-dashed border-border/60 bg-card/30">
-      <CardContent className="py-12 text-center">
-        <SearchIcon className="mx-auto h-6 w-6 text-muted-foreground" />
-        <p className="mt-3 text-sm text-muted-foreground">
-          Type a query to search agents, runs, conversations, and settings.
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Tip: press{" "}
-          <kbd className="rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px]">
-            ⌘K
-          </kbd>{" "}
-          anywhere in the app for a quick palette.
-        </p>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      {recents.length > 0 ? (
+        <Card className="border-border/70 bg-card/60 backdrop-blur" data-testid="card-recent-searches">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-base inline-flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" /> Recent searches
+            </CardTitle>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onClear}
+              data-testid="button-clear-recent-searches"
+            >
+              <X className="h-3.5 w-3.5" /> Clear
+            </Button>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {recents.map((r) => (
+              <Button
+                key={r}
+                variant="outline"
+                size="sm"
+                onClick={() => onPick(r)}
+                data-testid={`recent-search-${r.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                {r}
+              </Button>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card className="border-dashed border-border/60 bg-card/30">
+        <CardContent className="py-12 text-center">
+          <SearchIcon className="mx-auto h-6 w-6 text-muted-foreground" />
+          <p className="mt-3 text-sm text-muted-foreground">
+            Type a query to search agents, runs, conversations, and settings.
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Tip: press{" "}
+            <kbd className="rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px]">
+              ⌘K
+            </kbd>{" "}
+            anywhere in the app for a quick palette.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
