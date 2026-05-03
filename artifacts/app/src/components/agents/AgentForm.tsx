@@ -85,6 +85,17 @@ function validateConstraints(field: AgentInputField, value: unknown): string | n
     }
   }
   if (
+    typeof value === "string" &&
+    (field.type === "string" || field.type === "textarea")
+  ) {
+    if (typeof field.min === "number" && value.length < field.min) {
+      return `Must be at least ${field.min} character${field.min === 1 ? "" : "s"}`;
+    }
+    if (typeof field.max === "number" && value.length > field.max) {
+      return `Must be at most ${field.max} character${field.max === 1 ? "" : "s"}`;
+    }
+  }
+  if (
     field.type === "enum" &&
     field.options &&
     typeof value === "string" &&
