@@ -178,6 +178,7 @@ export const GetDashboardSummaryResponse = zod.object({
     runsTotal: zod.number(),
     activeAgents: zod.number(),
     revenueLeaksIdentified: zod.number(),
+    conversations: zod.number(),
   }),
   recentRuns: zod.array(
     zod.object({

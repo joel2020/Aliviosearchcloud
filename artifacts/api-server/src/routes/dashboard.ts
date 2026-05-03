@@ -1,6 +1,10 @@
 import { Router, type IRouter } from "express";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
-import { db, agentRunsTable } from "@workspace/db";
+import {
+  db,
+  agentRunsTable,
+  assistantConversationsTable,
+} from "@workspace/db";
 import { requireAuth } from "../middlewares/requireAuth";
 import { ensureUser, ensureBusiness } from "../lib/ensure";
 import { serializeAgentRun } from "../lib/agentRunStore";
@@ -29,6 +33,7 @@ router.get("/summary", requireAuth, async (req, res, next) => {
       activeAgentsRow,
       recentRunsRows,
       latestLeakRows,
+      conversationsRow,
     ] = await Promise.all([
       db
         .select({ c: sql<number>`count(*)::int` })
@@ -72,11 +77,16 @@ router.get("/summary", requireAuth, async (req, res, next) => {
         )
         .orderBy(desc(agentRunsTable.completedAt))
         .limit(1),
+      db
+        .select({ c: sql<number>`count(*)::int` })
+        .from(assistantConversationsTable)
+        .where(eq(assistantConversationsTable.businessId, business.id)),
     ]);
 
     const runsTotal = totalRow[0]?.c ?? 0;
     const runsThisWeek = weekRow[0]?.c ?? 0;
     const activeAgents = activeAgentsRow[0]?.c ?? 0;
+    const conversations = conversationsRow[0]?.c ?? 0;
 
     const suggestions: SuggestionDto[] = [];
     let revenueLeaksIdentified = 0;
@@ -132,6 +142,7 @@ router.get("/summary", requireAuth, async (req, res, next) => {
         runsTotal,
         activeAgents: Math.max(activeAgents, 0),
         revenueLeaksIdentified,
+        conversations,
       },
       recentRuns: recentRunsRows.map(serializeAgentRun),
       suggestedActions: suggestions,

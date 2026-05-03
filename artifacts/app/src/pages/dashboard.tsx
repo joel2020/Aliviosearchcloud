@@ -79,10 +79,10 @@ export default function DashboardPage() {
             },
             {
               label: "Conversations",
-              value: 0,
+              value: data?.kpis.conversations ?? 0,
               icon: MessageSquare,
               accent: "text-chart-3",
-              hint: "Assistant rolls out next",
+              hint: "Total assistant threads",
             },
             {
               label: "Revenue leaks found",

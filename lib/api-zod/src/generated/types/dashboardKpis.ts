@@ -11,4 +11,5 @@ export interface DashboardKpis {
   runsTotal: number;
   activeAgents: number;
   revenueLeaksIdentified: number;
+  conversations: number;
 }

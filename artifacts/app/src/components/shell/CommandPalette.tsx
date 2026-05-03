@@ -56,7 +56,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     if (!open) setQuery("");
   }, [open]);
 
-  const { data } = useQuery({
+  const { data, isFetching } = useQuery({
     ...getSearchWorkspaceQueryOptions({ q: debounced || "_" }),
     enabled: open && debounced.length > 0,
     staleTime: 5_000,
@@ -88,7 +88,11 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       />
       <CommandList>
         {debounced && !hasResults ? (
-          <CommandEmpty>No matches for “{debounced}”.</CommandEmpty>
+          isFetching ? (
+            <CommandEmpty>Searching…</CommandEmpty>
+          ) : (
+            <CommandEmpty>No matches for “{debounced}”.</CommandEmpty>
+          )
         ) : !debounced && recents.length === 0 ? (
           <CommandEmpty>Start typing to search the workspace.</CommandEmpty>
         ) : null}

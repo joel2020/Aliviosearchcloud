@@ -519,7 +519,10 @@ components:
           type: integer
         revenueLeaksIdentified:
           type: integer
-      required: [runsThisWeek, runsTotal, activeAgents, revenueLeaksIdentified]
+        conversations:
+          type: integer
+      required:
+        [runsThisWeek, runsTotal, activeAgents, revenueLeaksIdentified, conversations]
     DashboardSuggestion:
       type: object
       properties:
