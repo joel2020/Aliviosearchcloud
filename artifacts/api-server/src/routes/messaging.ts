@@ -121,8 +121,11 @@ router.post(
     }
 
     // Signature verification — protect against forged inbound messages.
-    // Skip in tests when explicitly opted in.
-    const skipSig = process.env["TWILIO_SKIP_SIGNATURE_CHECK"] === "1";
+    // The bypass flag is honored only when NODE_ENV !== "production" so a
+    // misconfigured prod env can never accidentally accept unsigned traffic.
+    const skipSig =
+      process.env["TWILIO_SKIP_SIGNATURE_CHECK"] === "1" &&
+      process.env["NODE_ENV"] !== "production";
     if (!skipSig) {
       const signature = req.header("X-Twilio-Signature") ?? "";
       // Prefer PUBLIC_APP_URL (the URL configured in the Twilio console) so
