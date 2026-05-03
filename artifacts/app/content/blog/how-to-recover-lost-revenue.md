@@ -35,6 +35,8 @@ You can't recover what you can't see. The first two weeks are about visibility.
 
 By day 14 you should know two things: which leak is biggest, and what fixing it is worth.
 
+:::revenue-calculator:::
+
 ## Days 15–30: Plug the biggest leak
 
 Pick the single biggest leak and fix it first. For most SMBs that's either missed calls or quoted-lead silence.
@@ -84,6 +86,8 @@ The last 10 days are about making this the new normal:
 - **Plan the next leak** to plug — usually instant response or outbound.
 
 By day 90, recovered revenue should be flowing in. Most Alivio customers see between $30k and $250k of recovered revenue in the first 90 days, depending on business size and which leaks they had.
+
+:::revenue-calculator:::
 
 ## What this isn't
 

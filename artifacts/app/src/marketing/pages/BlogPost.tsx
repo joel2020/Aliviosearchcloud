@@ -243,7 +243,7 @@ export default function BlogPostPage({
         <PostHero post={post} />
         <PostHeader post={post} />
         <div className="mx-auto mt-12 max-w-3xl">
-          <BlogMarkdown>{post.body}</BlogMarkdown>
+          <BlogMarkdown slug={post.slug}>{post.body}</BlogMarkdown>
         </div>
       </article>
       <section

@@ -25,6 +25,8 @@ For a higher-ticket B2B services business doing $5,000 engagements, the same 15 
 
 The missed call isn't a $0 event. It's the most expensive thing your phone line does each week.
 
+:::revenue-calculator:::
+
 ## Why even good businesses miss calls
 
 Owners often beat themselves up over missed calls. They shouldn't. The reasons are structural, not personal:
@@ -78,6 +80,8 @@ A simple back-of-the-napkin formula:
 > **Missed calls/week × close rate × average ticket × 50 weeks = annual recovery.**
 
 Even at a 20% close rate on previously missed calls, almost every SMB lands somewhere between $40k and $400k a year in recovered revenue.
+
+:::revenue-calculator:::
 
 If you want a more precise number — based on your actual call volume, ticket size, and current response rate — the free [Revenue Audit](/blog/how-to-recover-lost-revenue) sizes the leak in under 10 minutes.
 
