@@ -5,7 +5,7 @@ description: "Outbound sales is back — and it works for small businesses when 
 category: "Outbound Sales"
 publishedAt: "2026-04-01"
 tags: [outbound, cold-email, linkedin, sales-engine]
-ogImage: "/opengraph.jpg"
+ogImage: "/blog/outbound-sales-engine-for-small-businesses.webp"
 ---
 
 For a few years, outbound sales had a bad reputation in the small business world. Cold email got harder, LinkedIn got noisier, and most SMBs concluded outbound was for big companies with big SDR teams.

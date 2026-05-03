@@ -5,7 +5,7 @@ description: "Response time is the single biggest predictor of whether a lead co
 category: "Lead Follow-Up"
 publishedAt: "2026-04-15"
 tags: [speed-to-lead, automation, instant-response, conversion]
-ogImage: "/opengraph.jpg"
+ogImage: "/blog/speed-to-lead-automation.webp"
 ---
 
 If you only fix one thing in your sales process this year, fix response time. The data on speed-to-lead is some of the most consistent in B2B sales — and it almost always surprises owners when they see how steep the curve is.

@@ -5,7 +5,7 @@ description: "Every missed call is a quiet revenue leak. Here's how to size the 
 category: "Revenue Recovery"
 publishedAt: "2026-03-11"
 tags: [missed-calls, phones, revenue-leaks, automation]
-ogImage: "/opengraph.jpg"
+ogImage: "/blog/missed-calls-cost-businesses-money.webp"
 ---
 
 A phone ringing in the background of a small business is a familiar sound. So is voicemail picking up. What most owners don't realize is how directly that voicemail beep correlates to lost revenue — and how quickly the loss adds up.

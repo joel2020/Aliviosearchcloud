@@ -5,7 +5,7 @@ description: "An AI Revenue Engine is a stack of always-on agents that capture, 
 category: "AI Operations"
 publishedAt: "2026-03-25"
 tags: [ai-agents, revenue-engine, automation, strategy]
-ogImage: "/opengraph.jpg"
+ogImage: "/blog/ai-revenue-engine-small-business.webp"
 ---
 
 The phrase "AI Revenue Engine" gets thrown around loosely. In this piece we'll define it concretely, show what's inside one, and explain how it differs from the AI tooling small businesses are already using.

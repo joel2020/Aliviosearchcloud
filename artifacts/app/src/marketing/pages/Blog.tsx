@@ -11,6 +11,7 @@ import {
   getAllCategories,
 } from "@/marketing/blog/loader";
 import type { BlogPost } from "@/marketing/blog/types";
+import { getCoverImage } from "@/marketing/blog/coverImage";
 import { NewsletterSignup } from "../components/NewsletterSignup";
 
 const ALL_CATEGORIES = "All";
@@ -25,12 +26,27 @@ function formatDate(iso: string): string {
 }
 
 function PostCard({ post }: { post: BlogPost }) {
+  const cover = getCoverImage(post);
   return (
     <Link
       href={`/blog/${post.slug}`}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background transition-colors hover:border-primary/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       data-testid={`blog-card-${post.slug}`}
     >
+      <div className="aspect-[16/9] w-full overflow-hidden bg-muted">
+        <img
+          src={cover.src}
+          srcSet={cover.srcSet}
+          sizes={cover.sizes}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          width={1200}
+          height={675}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          data-testid={`blog-card-image-${post.slug}`}
+        />
+      </div>
       <div className="flex-1 p-6">
         <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
           <Badge variant="secondary" className="font-medium">

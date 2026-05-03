@@ -5,7 +5,7 @@ description: "Most SMB sales are lost to silence, not to objections. Here's the 
 category: "Lead Follow-Up"
 publishedAt: "2026-03-18"
 tags: [follow-up, sales, automation, conversion]
-ogImage: "/opengraph.jpg"
+ogImage: "/blog/best-lead-follow-up-system-small-businesses.webp"
 ---
 
 Ask any small business owner how many sales they've lost to a competitor, and they'll have a story. Ask them how many they've lost to silence — leads that just never replied, quotes that just never came back — and they'll usually go quiet.

@@ -5,7 +5,7 @@ description: "An AI business assistant is more than a chatbot — it's the opera
 category: "AI Operations"
 publishedAt: "2026-04-22"
 tags: [ai-assistant, operations, productivity, automation]
-ogImage: "/opengraph.jpg"
+ogImage: "/blog/ai-business-assistant-for-small-businesses.webp"
 ---
 
 Most small business owners run their company from twelve open browser tabs and a notebook. They check email, hop into the CRM, scan the calendar, look at sales numbers in a spreadsheet, answer a customer text, then start the cycle over. The cost of context-switching alone is brutal — and the leaks it creates are the silent killer of small business productivity.

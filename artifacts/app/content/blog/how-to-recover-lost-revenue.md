@@ -5,7 +5,7 @@ description: "A concrete 90-day plan for recovering revenue your business has al
 category: "Revenue Recovery"
 publishedAt: "2026-04-08"
 tags: [revenue-recovery, reactivation, follow-up, planning]
-ogImage: "/opengraph.jpg"
+ogImage: "/blog/how-to-recover-lost-revenue.webp"
 ---
 
 Most small business owners think growth means more leads. It usually doesn't. The fastest revenue most SMBs can find is already inside the business — quoted leads that went silent, dormant customers, missed calls from last quarter, ghosted proposals.

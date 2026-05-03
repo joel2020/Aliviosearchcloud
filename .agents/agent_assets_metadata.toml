@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "KWYiKCqfjG3XDtuwDX4eb"
+uri = "file://artifacts/app/public/blog/ai-business-assistant-for-small-businesses.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "H_kwIOcejWwKGLaSNKsFq"
+uri = "file://artifacts/app/public/blog/ai-revenue-engine-small-business.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "NduQVCAQ5kpl-MvoM9M5K"
+uri = "file://artifacts/app/public/blog/best-lead-follow-up-system-small-businesses.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "OBpKbPoD_udTcxAbWu51-"
+uri = "file://artifacts/app/public/blog/how-to-recover-lost-revenue.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "6QPpzBllUeLZxSMyXJa0o"
+uri = "file://artifacts/app/public/blog/missed-calls-cost-businesses-money.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "H4BbY4OqXJL_GrfmUHPI1"
+uri = "file://artifacts/app/public/blog/outbound-sales-engine-for-small-businesses.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "L3YG7gsKj80d0lps_RXXs"
+uri = "file://artifacts/app/public/blog/speed-to-lead-automation.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "3mO4RvYhyMy9am_a9M20g"
+uri = "file://artifacts/app/public/blog/why-small-businesses-lose-leads.png"
+type = "image"
+title = "generated_image"

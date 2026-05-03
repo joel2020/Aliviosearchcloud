@@ -13,6 +13,7 @@ import {
 } from "@/marketing/blog/loader";
 import { basePath } from "@/lib/clerkAppearance";
 import type { BlogPost } from "@/marketing/blog/types";
+import { getCoverImage } from "@/marketing/blog/coverImage";
 
 const STRUCTURED_DATA_SCRIPT_ID = "blog-jsonld";
 
@@ -65,6 +66,29 @@ function injectJsonLd(post: BlogPost, canonical: string, ogImage: string) {
 function removeJsonLd() {
   const el = document.getElementById(STRUCTURED_DATA_SCRIPT_ID);
   if (el) el.remove();
+}
+
+function PostHero({ post }: { post: BlogPost }) {
+  const cover = getCoverImage(
+    post,
+    "(min-width: 1024px) 768px, 100vw",
+  );
+  return (
+    <div className="mx-auto mb-10 max-w-4xl overflow-hidden rounded-2xl border border-border/60 bg-muted">
+      <img
+        src={cover.src}
+        srcSet={cover.srcSet}
+        sizes={cover.sizes}
+        alt=""
+        loading="eager"
+        decoding="async"
+        width={1200}
+        height={675}
+        className="aspect-[16/9] h-auto w-full object-cover"
+        data-testid={`blog-post-hero-${post.slug}`}
+      />
+    </div>
+  );
 }
 
 function PostHeader({ post }: { post: BlogPost }) {
@@ -216,6 +240,7 @@ export default function BlogPostPage({
   return (
     <MarketingLayout>
       <article className="px-6 pt-20 pb-16 md:pt-28">
+        <PostHero post={post} />
         <PostHeader post={post} />
         <div className="mx-auto mt-12 max-w-3xl">
           <BlogMarkdown>{post.body}</BlogMarkdown>

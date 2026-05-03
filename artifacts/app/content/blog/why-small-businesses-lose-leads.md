@@ -5,7 +5,7 @@ description: "Most SMBs don't have a lead-gen problem — they have a lead-leak 
 category: "Revenue Recovery"
 publishedAt: "2026-03-04"
 tags: [leads, revenue-leaks, follow-up, missed-calls]
-ogImage: "/opengraph.jpg"
+ogImage: "/blog/why-small-businesses-lose-leads.webp"
 ---
 
 Most small business owners we talk to are convinced their problem is at the top of the funnel. They want more ads, a better website, more SEO, more referrals. So they pour money into traffic — and the needle barely moves.
